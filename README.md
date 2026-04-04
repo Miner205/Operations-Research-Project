@@ -17,8 +17,7 @@ https://github.com/Miner205/Operations-Research-Project
 - ...
 
 # ToDo :
-- Transportation Problem: load TP (Read data), save TP, Display tables (Cost matrix, Transportation proposal, Potential costs table, Marginal costs table) ,...
-- Total cost calculation for a given transport proposal.
+- Transportation Problem: Display tables (..., Potential costs table, Marginal costs table) ,...
 - Solve TP : find the best way of transporting objects from suppliers to customers that minimizes
 the total cost of transport. /!\ Only balanced case.
     - Algorithm for setting the initial proposal : North-West.
@@ -35,4 +34,6 @@ the total cost of transport. /!\ Only balanced case.
 - Execution traces -> cf "Execution traces" Part in pdf consignes.
 
 # Functionalities done :
+- Transportation Problem: load TP (Read data), save TP, display matrix/tables(Cost matrix, Transportation proposal, ...)
+    - Total cost calculation for a given transport proposal. 
 - ...
