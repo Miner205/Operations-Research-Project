@@ -13,7 +13,12 @@ https://github.com/Miner205/Operations-Research-Project
 
 # Project specification :
 - Transportation Problems: only balanced case.
-- txt format : ...
+- By convention, (unit) costs are displayed in blue.
+- txt format - from pdf consignes:
+    - Line 1: number of suppliers, number of customers.
+    - Line 2 + i : cost(i,j) + provision(i).
+    /: i from 0 to number of suppliers, & j from 0 to number of customers.
+    - Last Line: orders.
 - ...
 
 # ToDo :

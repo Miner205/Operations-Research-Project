@@ -63,12 +63,16 @@ class TransportationProblem:
                 t += self.costs_matrix[i][j] * self.transport_proposal_matrix[i][j]
         return t
 
-    def display_matrix(self, matrix, aesthetic_spaces=1) -> None:
+    def display_matrix(self, matrix, aesthetic_spaces=1, is_costs_matrix=False, with_provisions_and_orders=False) -> None:
         """
+        display the matrix.
+
         :param matrix: self.costs_matrix, self.transport_proposal_matrix,
          ... and probably also "Potential costs table" and "Marginal costs table" - à tester quand on les aura.
-        :param aesthetic_spaces: int.
-        :return: Nothing
+        :param aesthetic_spaces: int ; nb of additional spaces for decoration.
+        :param is_costs_matrix: to display costs in blue (by convention).
+        :param with_provisions_and_orders: to also display provisions and orders.
+        :return: Nothing.
         """
         max_char_size = 0
         for i in range(self.nb_suppliers):
@@ -78,23 +82,48 @@ class TransportationProblem:
                     max_char_size = size_char
         max_char_size = max(max_char_size, len(str(self.nb_suppliers - 1)) + 1)  # + 1 for len('P')
         max_char_size = max(max_char_size, len(str(self.nb_customers - 1)) + 1)  # + 1 for len('C')
+        if with_provisions_and_orders:
+            max_char_size = max(max_char_size, 10)  # 10 for len("Provisions") ; also for len("Orders")
         max_char_size += 1 + aesthetic_spaces
 
         print(" " * max_char_size, end="")
         for k in range(self.nb_customers):
             print(f"{'C' + str(k+1):>{max_char_size}}", end="")  # align to the right with a maximum width of max_char_size
+        if with_provisions_and_orders:
+            print(f"{'Provisions':>{max_char_size}}", end="")
         print()
 
         for i in range(self.nb_suppliers):
             print(f"{'P' + str(i+1):>{max_char_size}}", end="")
             for j in range(self.nb_customers):
-                print(f"{matrix[i][j]:>{max_char_size}}", end="")
+                s = str(matrix[i][j])
+                l_s = 0
+                if is_costs_matrix:
+                    s = '\033[1;34;48m {}\033[0m'.format(matrix[i][j])  # to display the costs in blue.
+                    l_s = 14  # adjusting to work with colored text like it would without the colored text.
+                print(f"{s:>{max_char_size+l_s}}", end="")
+            if with_provisions_and_orders:
+                print(f"{self.provisions[i]:>{max_char_size}}", end="")
+            print()
+
+        if with_provisions_and_orders:
+            print(f"{'Orders':>{max_char_size}}", end="")
+            for g in range(self.nb_customers):
+                print(f"{self.orders[g]:>{max_char_size}}", end="")
             print()
 
     def display_full_transportation_problem_with_proposal(self, aesthetic_spaces=1):
-        max_char_size = 0
+        """
+        display the transportation problem: it's costs, transport proposal, provisions and orders.
+        note: display costs in blue (by convention).
+
+        :param aesthetic_spaces: int ; nb of additional spaces for decoration.
+        :return: Nothing.
+        """
+        max_char_size, max_prop_size = 0, 0
         for i in range(self.nb_suppliers):
             for j in range(self.nb_customers):
+                max_prop_size = max(max_prop_size, len(str(self.transport_proposal_matrix[i][j])))
                 size_char = len(str(self.costs_matrix[i][j])) + 3 + len(str(self.transport_proposal_matrix[i][j]))  # + 1 for len(' / ')
                 if size_char > max_char_size:
                     max_char_size = size_char
@@ -114,7 +143,8 @@ class TransportationProblem:
                 # text color info : https://www.geeksforgeeks.org/python/print-colors-python-terminal/
                 s = '\033[1;34;48m {}\033[0m'.format(self.costs_matrix[i][j])  # to display the costs in blue.
                 l_s = 14  # adjusting to work with colored text like it would without the colored text.
-                print(f"{s + ' / ' + str(self.transport_proposal_matrix[i][j]):>{max_char_size+l_s}}", end="")
+                print(f"{s + ' / ':>{max_char_size+l_s-max_prop_size}}", end="")
+                print(f"{self.transport_proposal_matrix[i][j]:>{max_prop_size}}", end="")
             print(f"{self.provisions[i]:>{max_char_size}}")
 
         print(f"{'Orders':>{max_char_size}}", end="")
@@ -157,3 +187,23 @@ def show_n_t(x: str) -> None:  # Just to verify than the 'save_tp_as_x' method w
             print(line.replace('\t', 't').replace('\n', 'n'))
             line = f.readline()
         # print(line.replace('\t', 't').replace('\n', 'n'))
+
+
+def verify_txt(x: str) -> None:
+    """to transform 't' or spaces in '\t', when creating/modifying transportation proposals txt from Pycharm."""
+    lines = []
+
+    with open("./transportation proposals/" + x + ".txt", 'r') as f:
+        line = f.readline()
+        while line != "":
+            line = ' '.join(line.split())  # transform spaces into only 1 space.
+            line = line.replace('t', '\t')
+            line = line.replace(' ', '\t')
+            line = line.replace('\t\t', '\t')
+            line = line.replace('\t\t\t', '\t')
+            lines.append(line)
+            line = f.readline()
+
+    with open("./transportation proposals/"+x+".txt", 'w') as f2:
+        for elt in lines:
+            f2.write(elt + '\n')
