@@ -1,6 +1,7 @@
 from transportation_problem import *
 
 verify_txt("constraint_table_example")  # -> potentiellement à mettre directement dans la fct load tp
+# show_n_t("constraint_table_example")
 tp = TransportationProblem("constraint_table_example")
 
 print()

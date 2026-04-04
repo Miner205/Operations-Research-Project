@@ -197,6 +197,7 @@ def verify_txt(x: str) -> None:
         line = f.readline()
         while line != "":
             line = ' '.join(line.split())  # transform spaces into only 1 space.
+            line = line.replace('\\', '')
             line = line.replace('t', '\t')
             line = line.replace(' ', '\t')
             line = line.replace('\t\t', '\t')
