@@ -68,7 +68,7 @@ class TransportationProblem:
             if answ == str(1):
                 self.north_west()
             elif answ == str(2): 
-                self.penalties()
+                self.balas_hammer()
 
     def north_west(self):
         available = self.provisions[:] # Allows copying quickly w/o affecting original attributes
@@ -83,4 +83,35 @@ class TransportationProblem:
                 j += 1
             else:
                 i += 1
-        
+
+    def balas_hammer(self):
+        available = self.provisions[:] # Allows copying quickly w/o affecting original attributes
+        to_complete = self.orders[:]
+        penalties_row = [0 for k in range(0,len(available))]
+        penalties_col = [0 for k in range(0,len(to_complete))]
+        while to_complete != [0 for k in range(0,len(to_complete))]:
+            for i in range(0, len(penalties_row)): # Process calculation for the penalties attributed to each row
+                min = [float('inf'),float('inf')] # Infinity is of course an easy minimum to dislodge
+                for j in range(len(self.orders)): # Goes through whole row
+                    if self.costs_matrix[i][j] <= min[0]: # if we find a cost lower than our minimum
+                        min[1] = min[0] # We move the former minimum to the second spot, becoming our 2nd lowest cost
+                        min[0] = self.costs_matrix[i][j]
+                if min[1] == float('inf'): # In case where we only get a single minimum due to the algorithm falling on the minimum of the array at first iteration, we add another minimum search to find the second one.
+                    for j in range(len(self.orders)):
+                        if self.costs_matrix[i][j] <= min[1] and self.costs_matrix[i][j] != min[0]: # exclude the smallest minimum
+                            min[1] = self.costs_matrix[i][j] # Assign penultimate to second minimum
+                penalties_row[i] = min[1] - min[0]
+            print(penalties_row)
+            for i in range(0, len(penalties_col)): # Process calculation for the penalties attributed to each column
+                min = [float('inf'),float('inf')]
+                for j in range(len(self.provisions)): # Goes through whole column
+                    if self.costs_matrix[j][i] <= min[0]: # if we find a cost lower than our minimum
+                        min[1] = min[0] # We move the former minimum to the second spot, becoming our 2nd lowest cost
+                        min[0] = self.costs_matrix[j][i]
+                if min[1] == float('inf'): # In case where we only get a single minimum due to the algorithm falling on the minimum of the array at first iteration, we add another minimum search to find the second one.
+                    for j in range(len(self.provisions)):
+                        if self.costs_matrix[j][i] <= min[1] and self.costs_matrix[j][i] != min[0]: # exclude the smallest minimum
+                            min[1] = self.costs_matrix[j][i] # Assign penultimate to second minimum
+                penalties_col[i] = min[1] - min[0]
+            print(penalties_col)
+            to_complete = [0 for k in range(0,len(to_complete))] # temporary loop breaker
