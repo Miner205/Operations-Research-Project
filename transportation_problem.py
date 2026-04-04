@@ -7,6 +7,7 @@ class TransportationProblem:
         self.provisions: list[int] = []  # P
         self.orders: list[int] = []  # C
         self.costs_matrix: list[list[int]] = []  # A
+        self.proposal = [] # The thing we're going to look at the most in this project, the proposals
         self.load_tp_x(x)
         #self.adjacency_matrix: list[list] = [['_' for _ in range(self.nb_vertices)] for _ in range(self.nb_vertices)]
         #self.compute_adjacency_matrix()
@@ -17,7 +18,8 @@ class TransportationProblem:
                 "Nb of customers: " + str(self.nb_customers) + '\n' +
                 "All provisions: " + str([p for p in self.provisions]) + '\n' +
                 "All orders: " + str([c for c in self.orders]) + '\n' +
-                "All costs: " + str([a for a in self.costs_matrix]))
+                "All costs: " + str([a for a in self.costs_matrix]) + '\n' +
+                "Proposal: " + str([p for p in self.proposal]))
 
     def load_tp_x(self, x: str) -> None:
         with open("./transportation proposals/"+x+".txt", 'r') as f:
@@ -38,6 +40,8 @@ class TransportationProblem:
             for elt in l_temp:
                 self.orders.append(int(elt))
 
+            self.proposal = [[0 for i in range(0,len(self.orders))] for j in range(0,len(self.provisions))]
+
             assert sum(self.provisions) == sum(self.orders), "The transportation problem is not balanced !! - Not supposed to be the case for this project."
 
     def save_tp_as_x(self, x: str) -> None:
@@ -55,3 +59,28 @@ class TransportationProblem:
             for k_elt in range(self.nb_customers-1):  # OR len(self.orders)-1  (it's the same).
                 s_temp += str(self.orders[k_elt]) + '\t'
             f.write(s_temp + str(self.orders[-1]) + '\n')
+
+    def first_proposal(self):
+        answ = 0
+        while answ not in [str(1), str(2)]:
+            print("Pick a first proposal method (1 North-West/ 2 Penalties) : ")
+            answ = input()
+            if answ == str(1):
+                self.north_west()
+            elif answ == str(2): 
+                self.penalties()
+
+    def north_west(self):
+        available = self.provisions[:] # Allows copying quickly w/o affecting original attributes
+        to_complete = self.orders[:]
+        i = 0
+        j = 0
+        while to_complete != [0 for k in range(0,len(to_complete))]:
+            self.proposal[i][j] = available[i] if available[i] < to_complete[j] else to_complete[j] # We got two cases, either supply < order and we put all the supply in the proposal cell, on the other case we put all the amount needed for the order in the cell.
+            available[i] = available[i] - self.proposal[i][j] # We update our supply and demand accordingly to the modification we've done
+            to_complete[j] = to_complete[j] - self.proposal[i][j]
+            if to_complete[j] == 0: # Following depletion of the demand or the supply, we move to the column to its right or the row under.
+                j += 1
+            else:
+                i += 1
+        
