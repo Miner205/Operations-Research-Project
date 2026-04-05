@@ -20,6 +20,7 @@ class TransportationProblem:
                 "transport proposal matrix: " + str([b for b in self.transport_proposal_matrix]))
 
     def load_tp_x(self, x: str) -> None:
+        verify_txt(x)
         with open("./transportation proposals/"+x+".txt", 'r') as f:
             line = f.readline()
             l_temp = line.strip('\n').split('\t')
@@ -184,27 +185,36 @@ def show_n_t(x: str) -> None:  # Just to verify than the 'save_tp_as_x' method w
     with open("./transportation proposals/" + x + ".txt", 'r') as f:
         line = f.readline()
         while line != "":
-            print(line.replace('\t', 't').replace('\n', 'n'))
+            print(line.replace('\t', '\\t').replace('\n', '\\n'))
             line = f.readline()
         # print(line.replace('\t', 't').replace('\n', 'n'))
 
 
 def verify_txt(x: str) -> None:
-    """to transform 't' or spaces in '\t', when creating/modifying transportation proposals txt from Pycharm."""
-    lines = []
+    """to transform 't', spaces or '\t' in '\t',
+    when creating/modifying transportation proposals txt from Pycharm,
+    - to be able to create/modify them easily from Pycharm."""
+    lines, unmodified_lines = [], []
 
     with open("./transportation proposals/" + x + ".txt", 'r') as f:
         line = f.readline()
         while line != "":
+            unmodified_lines.append(line)
             line = ' '.join(line.split())  # transform spaces into only 1 space.
             line = line.replace('\\', '')
             line = line.replace('t', '\t')
             line = line.replace(' ', '\t')
-            line = line.replace('\t\t', '\t')
             line = line.replace('\t\t\t', '\t')
-            lines.append(line)
+            line = line.replace('\t\t', '\t')
+            lines.append(line + '\n')
             line = f.readline()
 
-    with open("./transportation proposals/"+x+".txt", 'w') as f2:
-        for elt in lines:
-            f2.write(elt + '\n')
+    if unmodified_lines != lines:
+        with open("./transportation proposals/"+x+".txt", 'w') as f2:
+            for i in range(len(lines)):
+                if lines[i] != unmodified_lines[i]:
+                    print(f"|| A line has been modified in the txt file {x}:")
+                    temp1 = unmodified_lines[i].replace('\t', '\\t').replace('\n', '\\n')
+                    temp2 = lines[i].replace('\t', '\\t').replace('\n', '\\n')
+                    print(f"{temp1} -> {temp2} ||")
+                f2.write(lines[i])
