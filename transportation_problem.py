@@ -93,25 +93,54 @@ class TransportationProblem:
             for i in range(0, len(penalties_row)): # Process calculation for the penalties attributed to each row
                 min = [float('inf'),float('inf')] # Infinity is of course an easy minimum to dislodge
                 for j in range(len(self.orders)): # Goes through whole row
-                    if self.costs_matrix[i][j] <= min[0]: # if we find a cost lower than our minimum
+                    if self.costs_matrix[i][j] <= min[0] and penalties_row[i] != float('inf'): # if we find a cost lower than our minimum (excludes used rows marked by a +inf penalty)
                         min[1] = min[0] # We move the former minimum to the second spot, becoming our 2nd lowest cost
                         min[0] = self.costs_matrix[i][j]
                 if min[1] == float('inf'): # In case where we only get a single minimum due to the algorithm falling on the minimum of the array at first iteration, we add another minimum search to find the second one.
                     for j in range(len(self.orders)):
-                        if self.costs_matrix[i][j] <= min[1] and self.costs_matrix[i][j] != min[0]: # exclude the smallest minimum
+                        if self.costs_matrix[i][j] <= min[1] and self.costs_matrix[i][j] != min[0] and penalties_row[i] != float('inf'): # exclude the smallest minimum
                             min[1] = self.costs_matrix[i][j] # Assign penultimate to second minimum
-                penalties_row[i] = min[1] - min[0]
+                penalties_row[i] = min[1] - min[0] if min != [float('inf'),float('inf')] else float('inf') # to avoid inf - inf producing a nan, we replace by inf in some cases
             print(penalties_row)
             for i in range(0, len(penalties_col)): # Process calculation for the penalties attributed to each column
                 min = [float('inf'),float('inf')]
                 for j in range(len(self.provisions)): # Goes through whole column
-                    if self.costs_matrix[j][i] <= min[0]: # if we find a cost lower than our minimum
+                    if self.costs_matrix[j][i] <= min[0] and penalties_col[i] != float('inf'): # if we find a cost lower than our minimum (excluding columns used by the algorithm, marked with a +inf penalty)
                         min[1] = min[0] # We move the former minimum to the second spot, becoming our 2nd lowest cost
                         min[0] = self.costs_matrix[j][i]
                 if min[1] == float('inf'): # In case where we only get a single minimum due to the algorithm falling on the minimum of the array at first iteration, we add another minimum search to find the second one.
                     for j in range(len(self.provisions)):
-                        if self.costs_matrix[j][i] <= min[1] and self.costs_matrix[j][i] != min[0]: # exclude the smallest minimum
+                        if self.costs_matrix[j][i] <= min[1] and self.costs_matrix[j][i] != min[0] and penalties_col[i] != float('inf'): # exclude the smallest minimum
                             min[1] = self.costs_matrix[j][i] # Assign penultimate to second minimum
-                penalties_col[i] = min[1] - min[0]
+                penalties_col[i] = min[1] - min[0] if min != [float('inf'),float('inf')] else float('inf') # to avoid inf - inf producing a nan, we replace by inf in some cases
             print(penalties_col)
-            to_complete = [0 for k in range(0,len(to_complete))] # temporary loop breaker
+
+            min_pen_col = [penalties_col[0], 0]
+            for i in range(0, len(penalties_col)): # We look towards minimum penalty for row and column, and their position in the list
+                if penalties_col[i] <= min_pen_col[0]:
+                    min_pen_col = [penalties_col[i],i]
+            min_pen_row = [penalties_row[0],0]
+            for i in range(0,len(penalties_row)):
+                if penalties_row[i] <= min_pen_row[0]:
+                    min_pen_row = [penalties_row[i],i]
+
+            if min_pen_col[0] < min_pen_row[0]: # If the minimum of the columns is inferior to minimum of rows
+                for k in range(len(self.proposal)): # 
+                    self.proposal[k][min_pen_col[1]] = available[k] if available[k] < to_complete[min_pen_col[1]] else to_complete[min_pen_col[1]] 
+                    available[k] = available[k] - self.proposal[k][min_pen_col[1]] # We update our supply and demand accordingly to the modification we've done
+                    to_complete[min_pen_col[1]] = to_complete[min_pen_col[1]] - self.proposal[k][min_pen_col[1]]
+                    if to_complete[min_pen_col[1]] == 0:
+                        penalties_col[min_pen_col[1]] = float('inf') # Signal that this spot should not be used for penalty calculation
+                    if available[k] == 0:
+                        penalties_row[k] = float('inf')
+            else: # If the minimum of rows is smaller
+                for k in range(len(self.proposal[0])):
+                    self.proposal[min_pen_row[1]][k] = available[min_pen_row[1]] if available[min_pen_row[1]] < to_complete[k] else to_complete[k] # We got two cases, either supply < order and we put all the supply in the proposal cell, on the other case we put all the amount needed for the order in the cell.
+                    available[min_pen_row[1]] = available[min_pen_row[1]] - self.proposal[min_pen_row[1]][k] # We update our supply and demand accordingly to the modification we've done
+                    to_complete[k] = to_complete[k] - self.proposal[min_pen_row[1]][k]
+                    if to_complete[k] == 0:
+                        penalties_col[k] = float('inf')
+                    if available[min_pen_row[1]] == 0:
+                        penalties_row[min_pen_row[1]] = float('inf')
+
+            # to_complete = [0 for k in range(0,len(to_complete))] # temporary loop breaker
