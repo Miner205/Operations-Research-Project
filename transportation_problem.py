@@ -113,7 +113,7 @@ class TransportationProblem:
                 print(f"{self.orders[g]:>{max_char_size}}", end="")
             print()
 
-    def display_full_transportation_problem_with_proposal(self, aesthetic_spaces=1, balas_hammer=tuple(), penalties=tuple()):
+    def display_full_transportation_problem_with_proposal(self, aesthetic_spaces=1, balas_hammer=None, penalties=None, penalty_equalities=None):
         """
         display the transportation problem: it's costs, transport proposal, provisions and orders.
         note: display costs in blue (by convention).
@@ -121,6 +121,7 @@ class TransportationProblem:
         :param aesthetic_spaces: int ; nb of additional spaces for decoration.
         :param balas_hammer: "Display of row(s) (or columns) with the maximum penalty" -> put it in color.
         :param penalties: to display penalties.
+        :param penalty_equalities: to display in a different color the rows or cols with same penalty value than the maximum penalty.
         :return: Nothing.
         """
         max_char_size, max_prop_size = 0, 0
@@ -152,6 +153,14 @@ class TransportationProblem:
                 print(f"{s + ' / ':>{max_char_size+l_s-max_prop_size}}", end="")
                 s_balas = str(self.transport_proposal_matrix[i][j])
                 l_s_balas = 0
+                if penalty_equalities:
+                    for elt in penalty_equalities:
+                        if elt[0] == "col" and elt[1] == j:
+                            s_balas = '\033[1;33;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in yellow.
+                            l_s_balas = 14
+                        elif elt[0] == "row" and elt[1] == i:
+                            s_balas = '\033[1;33;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in yellow.
+                            l_s_balas = 14
                 if balas_hammer:
                     if balas_hammer[0] and j == balas_hammer[2]:  # = max penalty in a col
                         s_balas = '\033[1;31;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red.
@@ -257,6 +266,20 @@ class TransportationProblem:
                 if penalties_row[i] >= max_pen_row[0]:
                     max_pen_row = [penalties_row[i], i]
 
+            # penalty_equalities: to display in a different color the rows or cols with same penalty value than the maximum penalty.
+            penalty_equalities = []
+            if max_pen_col[0] >= max_pen_row[0]:
+                for i in range(0, len(penalties_col)):
+                    if penalties_col[i] == max_pen_col[0]:
+                        penalty_equalities.append(("col", i))
+            if max_pen_col[0] <= max_pen_row[0]:
+                for i in range(0, len(penalties_row)):
+                    if penalties_row[i] == max_pen_row[0]:
+                        penalty_equalities.append(("row", i))
+            # ## display : "Display of row(s) (or columns) with the maximum penalty" -> put them in colors
+            penalties_tuple = (penalties_row, penalties_col)
+            self.display_full_transportation_problem_with_proposal(penalties=penalties_tuple, penalty_equalities=penalty_equalities)
+
             # find max penalty
             # and do stuff with it :
             # "choice of edge to fill" = find min cost where max penalty, and fill max quantity possible.
@@ -300,15 +323,17 @@ class TransportationProblem:
             print("transport proposal matrix:", self.transport_proposal_matrix)
             print("costs matrix:", self.costs_matrix)
 
-            # display : "Display of row(s) (or columns) with the maximum penalty" -> put it in color
+            # ## display : "Display of row(s) (or columns) with the maximum penalty" -> put them in colors
             balas_tuple = (max_pen_col[0] > max_pen_row[0], cheapest_cell_index if max_pen_col[0] > max_pen_row[0] else max_pen_row[1], max_pen_col[1] if max_pen_col[0] > max_pen_row[0] else cheapest_cell_index)
 
             # -> without display penalties :
-            #self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple)
+            # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple)
+            # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalty_equalities=penalty_equalities)
 
             # -> with display penalties :
             penalties_tuple = (penalties_row, penalties_col)
-            self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalties=penalties_tuple)
+            # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalties=penalties_tuple)
+            self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalties=penalties_tuple, penalty_equalities=penalty_equalities)
 
             print()
 
