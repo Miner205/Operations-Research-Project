@@ -23,13 +23,7 @@ https://github.com/Miner205/Operations-Research-Project
 
 # ToDo :
 - Transportation Problem: Display tables (..., Potential costs table, Marginal costs table) ,...
-- Solve TP : find the best way of transporting objects from suppliers to customers that minimizes
-the total cost of transport. /!\ Only balanced case.
-    - Algorithm for setting the initial proposal : North-West.
-    - Algorithm for setting the initial proposal : Balas-Hammer.
-        - Calculation of penalties.
-        - Display of row(s) (or columns) with the maximum penalty.
-        - Choice of edge to fill.
+- Solve TP : find the best way of transporting objects from suppliers to customers that minimizes the total cost of transport. /!\ Only balanced case.
     - Solving algorithm : the stepping-stone method with potential.
         - Test whether the proposition is acyclic : we’ll use a Breadth-first algorithm.
         - etc. -> cf pdf consignes.
@@ -41,4 +35,11 @@ the total cost of transport. /!\ Only balanced case.
 # Functionalities done :
 - Transportation Problem: load TP (Read data), save TP, display matrix/tables(Cost matrix, Transportation proposal, ...)
     - Total cost calculation for a given transport proposal. 
+- Solve TP :
+    - Algorithm for setting the initial proposal : North-West.
+    - Algorithm for setting the initial proposal : Balas-Hammer.
+        - Calculation of penalties.
+        - Display of row(s) (or columns) with the maximum penalty.
+        - Choice of edge to fill.
+    - ...
 - ...
