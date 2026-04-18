@@ -165,11 +165,15 @@ class TransportationProblem:
                     if balas_hammer[0] and j == balas_hammer[2]:  # = max penalty in a col
                         s_balas = '\033[1;31;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red.
                         l_s_balas = 14
-                    elif not (balas_hammer[0]) and i == balas_hammer[1]:  # = maw penalty in a row
+                    elif not (balas_hammer[0]) and i == balas_hammer[2]:  # = maw penalty in a row
                         s_balas = '\033[1;31;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red.
                         l_s_balas = 14
-                    if i == balas_hammer[1] and j == balas_hammer[2]:
-                        s_balas = '\033[1;31;40m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red and black background.
+                    if balas_hammer[0]:
+                        if i == balas_hammer[1] and j == balas_hammer[2]:
+                            s_balas = '\033[1;31;40m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red and black background.
+                    else:
+                        if j == balas_hammer[1] and i == balas_hammer[2]:
+                            s_balas = '\033[1;31;40m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red and black background.
                 print(f"{s_balas:>{max_prop_size+l_s_balas}}", end="")
             print(f"{self.provisions[i]:>{max_char_size}}", end="")
             if penalties:
@@ -231,29 +235,31 @@ class TransportationProblem:
             for i in range(0, len(penalties_row)):
                 min = [float('inf'), float('inf')]  # Infinity is of course an easy minimum to dislodge
                 for j in range(len(self.orders)):  # Goes through whole row
-                    if self.costs_matrix[i][j] <= min[0] and penalties_row[i] != -1:  # if we find a cost lower than our minimum (excludes used rows marked by a -1 penalty)
+                    if self.costs_matrix[i][j] <= min[0] and penalties_row[i] != -1 and penalties_col[j] != -1:  # if we find a cost lower than our minimum (excludes used rows and columns marked by a -1 penalty)
                         min[1] = min[0]  # We move the former minimum to the second spot, becoming our 2nd lowest cost
                         min[0] = self.costs_matrix[i][j]
-                if min[1] == float('inf'):  # In case where we only get a single minimum due to the algorithm falling on the minimum of the array at first iteration, we add another minimum search to find the second one.
-                    for j in range(len(self.orders)):
-                        if self.costs_matrix[i][j] <= min[1] and self.costs_matrix[i][j] != min[0] and penalties_row[i] != -1:  # exclude the smallest minimum
-                            min[1] = self.costs_matrix[i][j]  # Assign penultimate to second minimum
+                # - to be sure to have the 2nd lowest minimum in min[1] we check again:
+                for j in range(len(self.orders)):
+                    if self.costs_matrix[i][j] <= min[1] and self.costs_matrix[i][j] != min[0] and penalties_row[i] != -1 and penalties_col[j] != -1:  # exclude the smallest minimum
+                        min[1] = self.costs_matrix[i][j]  # Assign penultimate to second minimum
+                # -
                 penalties_row[i] = min[1] - min[0] if min != [float('inf'), float('inf')] else -1  # to avoid inf - inf producing a nan, we replace by -1 in some cases
-            print("Penalties of rows : ", str(penalties_row))
+            print("Penalties of rows :", str(penalties_row))
 
             # Process calculation for the penalties attributed to each column
             for i in range(0, len(penalties_col)):
                 min = [float('inf'), float('inf')]
                 for j in range(len(self.provisions)):  # Goes through whole column
-                    if self.costs_matrix[j][i] <= min[0] and penalties_col[i] != -1:  # if we find a cost lower than our minimum (excluding columns used by the algorithm, marked with a -1 penalty)
+                    if self.costs_matrix[j][i] <= min[0] and penalties_col[i] != -1 and penalties_row[j] != -1:  # if we find a cost lower than our minimum (excluding columns and rows used by the algorithm, marked with a -1 penalty)
                         min[1] = min[0]  # We move the former minimum to the second spot, becoming our 2nd lowest cost
                         min[0] = self.costs_matrix[j][i]
-                if min[1] == float('inf'):  # In case where we only get a single minimum due to the algorithm falling on the minimum of the array at first iteration, we add another minimum search to find the second one.
-                    for j in range(len(self.provisions)):
-                        if self.costs_matrix[j][i] <= min[1] and self.costs_matrix[j][i] != min[0] and penalties_col[i] != -1:  # exclude the smallest minimum
-                            min[1] = self.costs_matrix[j][i]  # Assign penultimate to second minimum
+                # - to be sure to have the 2nd lowest minimum in min[1] we check again:
+                for j in range(len(self.provisions)):
+                    if self.costs_matrix[j][i] <= min[1] and self.costs_matrix[j][i] != min[0] and penalties_col[i] != -1 and penalties_row[j] != -1:  # exclude the smallest minimum
+                        min[1] = self.costs_matrix[j][i]  # Assign penultimate to second minimum
+                # -
                 penalties_col[i] = min[1] - min[0] if min != [float('inf'), float('inf')] else -1  # to avoid inf - inf producing a nan, we replace by inf in some cases
-            print("Penalties of columns : ", str(penalties_col))
+            print("Penalties of columns :", str(penalties_col))
 
             # find col with maximum penalty
             max_pen_col = [penalties_col[0], 0]
@@ -280,51 +286,80 @@ class TransportationProblem:
             penalties_tuple = (penalties_row, penalties_col)
             self.display_full_transportation_problem_with_proposal(penalties=penalties_tuple, penalty_equalities=penalty_equalities)
 
-            # find max penalty
+            # find max penalty. (Is there one or many ? Is it in a row or in a col ?)
             # and do stuff with it :
-            # "choice of edge to fill" = find min cost where max penalty, and fill max quantity possible.
-            if max_pen_col[0] > max_pen_row[0]:  # If the maximum of the columns is superior to maximum of rows
+            # "choice of edge to fill" = find min cost across all max penalties, and fill max quantity possible.
+            minimum_cost = chosen_penalty = cheapest_cell_index = max_quantity_possible = None
+            for p in penalty_equalities:
+                # find the max penalty to use by looking where is the minimum cost in the max penalties cols/rows.
                 # find min cost
-                cheapest_cell_index = None  # Holds index of the cheapest cell we'll find
-                for k in range(len(self.transport_proposal_matrix)):
-                    if cheapest_cell_index is None:
-                        if penalties_row[k] != -1:
-                            cheapest_cell_index = k
-                    else:
-                        if self.costs_matrix[k][max_pen_col[1]] < self.costs_matrix[cheapest_cell_index][max_pen_col[1]] and penalties_row[k] != -1:  # Finds cell with cheapest cost (excluding -1 rows)
-                            cheapest_cell_index = k
+                if p[0] == "col":
+                    for s in range(self.nb_suppliers):  # self.nb_suppliers = len(self.transport_proposal_matrix)
+                        if cheapest_cell_index is None:
+                            if penalties_row[s] != -1:
+                                minimum_cost = self.costs_matrix[s][p[1]]
+                                chosen_penalty = p
+                                cheapest_cell_index = s
+                                max_quantity_possible = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[chosen_penalty[1]] else to_complete[chosen_penalty[1]]  # Assigns as much supply as possible
+                        else:
+                            if self.costs_matrix[s][p[1]] < minimum_cost and penalties_row[s] != -1:  # Finds cell with cheapest cost (excluding -1 cols)
+                                minimum_cost = self.costs_matrix[s][p[1]]
+                                chosen_penalty = p
+                                cheapest_cell_index = s
+                                max_quantity_possible = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[chosen_penalty[1]] else to_complete[chosen_penalty[1]]  # Assigns as much supply as possible
+                            # tie case = if two minimum costs are equal, choose where we can assign as much as possible :
+                            elif self.costs_matrix[s][p[1]] == minimum_cost and penalties_row[s] != -1:
+                                if max_quantity_possible < (available[s] if available[s] < to_complete[p[1]] else to_complete[p[1]]):
+                                    minimum_cost = self.costs_matrix[s][p[1]]
+                                    chosen_penalty = p
+                                    cheapest_cell_index = s
+                                    max_quantity_possible = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[chosen_penalty[1]] else to_complete[chosen_penalty[1]]  # Assigns as much supply as possible
+                else:  # if elt[0] == "row":
+                    for c in range(self.nb_customers):  # self.nb_customers = len(self.transport_proposal_matrix[0])
+                        if cheapest_cell_index is None:
+                            if penalties_col[c] != -1:
+                                minimum_cost = self.costs_matrix[p[1]][c]
+                                chosen_penalty = p
+                                cheapest_cell_index = c
+                                max_quantity_possible = available[chosen_penalty[1]] if available[chosen_penalty[1]] < to_complete[cheapest_cell_index] else to_complete[cheapest_cell_index]  # Assigns as much supply as possible
+                        else:
+                            if self.costs_matrix[p[1]][c] < minimum_cost and penalties_col[c] != -1:  # Finds cell with cheapest cost (excluding -1 rows)
+                                minimum_cost = self.costs_matrix[p[1]][c]
+                                chosen_penalty = p
+                                cheapest_cell_index = c
+                                max_quantity_possible = available[chosen_penalty[1]] if available[chosen_penalty[1]] < to_complete[cheapest_cell_index] else to_complete[cheapest_cell_index]  # Assigns as much supply as possible
+                            # tie case = if two minimum costs are equal, choose where we can assign as much as possible :
+                            elif self.costs_matrix[p[1]][c] == minimum_cost and penalties_col[c] != -1:
+                                if max_quantity_possible < (available[p[1]] if available[p[1]] < to_complete[c] else to_complete[c]):
+                                    minimum_cost = self.costs_matrix[p[1]][c]
+                                    chosen_penalty = p
+                                    cheapest_cell_index = c
+                                    max_quantity_possible = available[chosen_penalty[1]] if available[chosen_penalty[1]] < to_complete[cheapest_cell_index] else to_complete[cheapest_cell_index]
+
+            if chosen_penalty[0] == "col":  # If the chosen max penalty is a column
                 # fill max quantity possible
-                self.transport_proposal_matrix[cheapest_cell_index][max_pen_col[1]] = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[max_pen_col[1]] else to_complete[max_pen_col[1]]  # Assigns as much supply as possible to that cheap cell
-                available[cheapest_cell_index] = available[cheapest_cell_index] - self.transport_proposal_matrix[cheapest_cell_index][max_pen_col[1]]  # We update our supply and demand accordingly to the modification we've done
-                to_complete[max_pen_col[1]] = to_complete[max_pen_col[1]] - self.transport_proposal_matrix[cheapest_cell_index][max_pen_col[1]]
-                if to_complete[max_pen_col[1]] == 0:
-                    penalties_col[max_pen_col[1]] = -1  # Signal that this spot should not be used for penalty calculation
+                self.transport_proposal_matrix[cheapest_cell_index][chosen_penalty[1]] = max_quantity_possible  # Assigns as much supply as possible to that cheap cell
+                available[cheapest_cell_index] = available[cheapest_cell_index] - self.transport_proposal_matrix[cheapest_cell_index][chosen_penalty[1]]  # We update our supply and demand accordingly to the modification we've done
+                to_complete[chosen_penalty[1]] = to_complete[chosen_penalty[1]] - self.transport_proposal_matrix[cheapest_cell_index][chosen_penalty[1]]
+                if to_complete[chosen_penalty[1]] == 0:
+                    penalties_col[chosen_penalty[1]] = -1  # Signal that this spot should not be used for penalty calculation
                 if available[cheapest_cell_index] == 0:
                     penalties_row[cheapest_cell_index] = -1
-            else:  # If the maximum of columns is smaller
-                # find min cost
-                cheapest_cell_index = None
-                for k in range(len(self.transport_proposal_matrix[0])):  # ibid
-                    if cheapest_cell_index is None:
-                        if penalties_row[k] != -1:
-                            cheapest_cell_index = k
-                    else:
-                        if self.costs_matrix[max_pen_row[1]][k] < self.costs_matrix[max_pen_row[1]][cheapest_cell_index] and penalties_col[k] != -1:  # Finds cheapest cost (excluding -1 cols)
-                            cheapest_cell_index = k
+            else:  # If the chosen max penalty is a row
                 # fill max quantity possible
-                self.transport_proposal_matrix[max_pen_row[1]][cheapest_cell_index] = available[max_pen_row[1]] if available[max_pen_row[1]] < to_complete[cheapest_cell_index] else to_complete[cheapest_cell_index]  # We got two cases, either supply < order and we put all the supply in the proposal cell, on the other case we put all the amount needed for the order in the cell.
-                available[max_pen_row[1]] = available[max_pen_row[1]] - self.transport_proposal_matrix[max_pen_row[1]][cheapest_cell_index]  # We update our supply and demand accordingly to the modification we've done
-                to_complete[cheapest_cell_index] = to_complete[cheapest_cell_index] - self.transport_proposal_matrix[max_pen_row[1]][cheapest_cell_index]
+                self.transport_proposal_matrix[chosen_penalty[1]][cheapest_cell_index] = max_quantity_possible  # We got two cases, either supply < order and we put all the supply in the proposal cell, on the other case we put all the amount needed for the order in the cell.
+                available[chosen_penalty[1]] = available[chosen_penalty[1]] - self.transport_proposal_matrix[chosen_penalty[1]][cheapest_cell_index]  # We update our supply and demand accordingly to the modification we've done
+                to_complete[cheapest_cell_index] = to_complete[cheapest_cell_index] - self.transport_proposal_matrix[chosen_penalty[1]][cheapest_cell_index]
                 if to_complete[cheapest_cell_index] == 0:
                     penalties_col[cheapest_cell_index] = -1
-                if available[max_pen_row[1]] == 0:
-                    penalties_row[max_pen_row[1]] = -1
+                if available[chosen_penalty[1]] == 0:
+                    penalties_row[chosen_penalty[1]] = -1
 
             print("transport proposal matrix:", self.transport_proposal_matrix)
             print("costs matrix:", self.costs_matrix)
 
             # ## display : "Display of row(s) (or columns) with the maximum penalty" -> put them in colors
-            balas_tuple = (max_pen_col[0] > max_pen_row[0], cheapest_cell_index if max_pen_col[0] > max_pen_row[0] else max_pen_row[1], max_pen_col[1] if max_pen_col[0] > max_pen_row[0] else cheapest_cell_index)
+            balas_tuple = (chosen_penalty[0] == "col", cheapest_cell_index, chosen_penalty[1])
 
             # -> without display penalties :
             # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple)

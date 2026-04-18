@@ -1,6 +1,6 @@
 from transportation_problem import *
 
-tp = TransportationProblem("constraint_table_example")
+tp = TransportationProblem("balas_hammer_tie_cases_test")
 
 print()
 tp.display_full_transportation_problem_with_proposal()
