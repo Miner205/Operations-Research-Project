@@ -192,13 +192,18 @@ class TransportationProblem:
 
     def first_proposal(self):
         answer = 0
-        while answer not in ['1', '2']:
-            print("Pick a initial proposal method (1 for North-West, 2 for Balas-Hammer/Penalties) : ")
+        while answer not in ['1', '2', '3']:
+            print("Pick a initial proposal method :\n"
+                  "1 for North-West\n"
+                  "2 for Balas-Hammer/Penalties with Display\n"
+                  "3 for Balas-Hammer/Penalties without Display")
             answer = input()
             if answer == '1':
                 self.north_west()
             elif answer == '2':
                 self.balas_hammer()
+            elif answer == '3':
+                self.balas_hammer(with_display=False)
 
     def north_west(self):
         """Compute/set the initial proposal using North-West method,
@@ -216,7 +221,7 @@ class TransportationProblem:
             else:
                 i += 1
 
-    def balas_hammer(self):
+    def balas_hammer(self, with_display=True):
         """Compute/set the initial proposal using Balas-Hammer/Penalties method,
         put result in self.transport_proposal_matrix."""
 
@@ -244,7 +249,8 @@ class TransportationProblem:
                         min[1] = self.costs_matrix[i][j]  # Assign penultimate to second minimum
                 # -
                 penalties_row[i] = min[1] - min[0] if min != [float('inf'), float('inf')] else -1  # to avoid inf - inf producing a nan, we replace by -1 in some cases
-            print("Penalties of rows :", str(penalties_row))
+            if with_display:
+                print("Penalties of rows :", str(penalties_row))
 
             # Process calculation for the penalties attributed to each column
             for i in range(0, len(penalties_col)):
@@ -259,7 +265,8 @@ class TransportationProblem:
                         min[1] = self.costs_matrix[j][i]  # Assign penultimate to second minimum
                 # -
                 penalties_col[i] = min[1] - min[0] if min != [float('inf'), float('inf')] else -1  # to avoid inf - inf producing a nan, we replace by inf in some cases
-            print("Penalties of columns :", str(penalties_col))
+            if with_display:
+                print("Penalties of columns :", str(penalties_col))
 
             # find col with maximum penalty
             max_pen_col = [penalties_col[0], 0]
@@ -283,8 +290,9 @@ class TransportationProblem:
                     if penalties_row[i] == max_pen_row[0]:
                         penalty_equalities.append(("row", i))
             # ## display : "Display of row(s) (or columns) with the maximum penalty" -> put them in colors
-            penalties_tuple = (penalties_row, penalties_col)
-            self.display_full_transportation_problem_with_proposal(penalties=penalties_tuple, penalty_equalities=penalty_equalities)
+            if with_display:
+                penalties_tuple = (penalties_row, penalties_col)
+                self.display_full_transportation_problem_with_proposal(penalties=penalties_tuple, penalty_equalities=penalty_equalities)
 
             # find max penalty. (Is there one or many ? Is it in a row or in a col ?)
             # and do stuff with it :
@@ -355,22 +363,23 @@ class TransportationProblem:
                 if available[chosen_penalty[1]] == 0:
                     penalties_row[chosen_penalty[1]] = -1
 
-            print("transport proposal matrix:", self.transport_proposal_matrix)
-            print("costs matrix:", self.costs_matrix)
+            if with_display:
+                print("transport proposal matrix:", self.transport_proposal_matrix)
+                print("costs matrix:", self.costs_matrix)
 
-            # ## display : "Display of row(s) (or columns) with the maximum penalty" -> put them in colors
-            balas_tuple = (chosen_penalty[0] == "col", cheapest_cell_index, chosen_penalty[1])
+                # ## display : "Display of row(s) (or columns) with the maximum penalty" -> put them in colors
+                balas_tuple = (chosen_penalty[0] == "col", cheapest_cell_index, chosen_penalty[1])
 
-            # -> without display penalties :
-            # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple)
-            # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalty_equalities=penalty_equalities)
+                # -> without display penalties :
+                # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple)
+                # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalty_equalities=penalty_equalities)
 
-            # -> with display penalties :
-            penalties_tuple = (penalties_row, penalties_col)
-            # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalties=penalties_tuple)
-            self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalties=penalties_tuple, penalty_equalities=penalty_equalities)
+                # -> with display penalties :
+                penalties_tuple = (penalties_row, penalties_col)
+                # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalties=penalties_tuple)
+                self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalties=penalties_tuple, penalty_equalities=penalty_equalities)
 
-            print()
+                print()
 
         # end while loop / Balas-Hammer
 
