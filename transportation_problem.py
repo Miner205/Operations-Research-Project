@@ -21,7 +21,7 @@ class TransportationProblem:
 
     def load_tp_x(self, x: str) -> None:
         verify_txt(x)
-        with open("./transportation proposals/"+x+".txt", 'r') as f:
+        with open("./transportation proposals/"+str(x)+".txt", 'r') as f:
             line = f.readline()
             l_temp = line.strip('\n').split('\t')
             self.nb_suppliers, self.nb_customers = int(l_temp[0]), int(l_temp[1])
@@ -399,7 +399,7 @@ def verify_txt(x: str) -> None:
     - to be able to create/modify them easily from Pycharm."""
     lines, unmodified_lines = [], []
 
-    with open("./transportation proposals/" + x + ".txt", 'r') as f:
+    with open("./transportation proposals/" + str(x) + ".txt", 'r') as f:
         line = f.readline()
         while line != "":
             unmodified_lines.append(line)
@@ -413,7 +413,7 @@ def verify_txt(x: str) -> None:
             line = f.readline()
 
     if unmodified_lines != lines:
-        with open("./transportation proposals/"+x+".txt", 'w') as f2:
+        with open("./transportation proposals/"+str(x)+".txt", 'w') as f2:
             for i in range(len(lines)):
                 if lines[i] != unmodified_lines[i]:
                     print(f"|| A line has been modified in the txt file {x}:")
