@@ -9,6 +9,7 @@ while tp_number >= 0:
     while tp_number == 0:
         if c == 0:
             tp_number = int(input(first_message))
+            print(tp_number)
         else:
             tp_number = int(input(redo_message))
         if tp_number < len(indexes) and tp_number >0:
@@ -18,7 +19,7 @@ while tp_number >= 0:
             pass
         else:
             print("That transportation problem doesn't exist. Please try again.")
-            tp_number = int(input("Enter the number of the transportation problem you want to solve (or a negative number to exit): "))
+            tp_number = 0 # Putting an input here will make the program go out of the while, without initializing the tp variable. Putting at 0 will iterate back at the start of the loop
     if tp_number >= 0:
         print()
         tp.display_full_transportation_problem_with_proposal()
@@ -48,11 +49,3 @@ while tp_number >= 0:
         tp_number = 0
         c+=1
 print("You have exited the program. Goodbye!")
-
-
-
-
-
-'''tp.save_tp_as_x("copy 6")
-show_n_t("6")
-show_n_t("copy 6")'''
