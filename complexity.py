@@ -2,18 +2,24 @@ import time
 import random
 import os
 import sys
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from transportation_problem import TransportationProblem
 
-# --- ASTUCE MAGIQUE ---
-# Bloque les "print" pendant les tests pour ne pas fausser le temps ni crash le PC
+
 class HiddenPrints:
+    """
+    Hide the print commands during tests to prevent wrong timing computation.
+    """
     def __enter__(self):
         self._original_stdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout.close()
         sys.stdout = self._original_stdout
+
 
 def generate_random_tp_file(n, filename="random_temp"):
     """Génère un problème aléatoire et le sauvegarde au format attendu par l'équipe."""
@@ -35,20 +41,24 @@ def generate_random_tp_file(n, filename="random_temp"):
     
     return filename
 
+
 def run_complexity_study():
-    # ⚠️ Teste avec ça d'abord ! Quand tout marche, remplace par les valeurs du sujet : 
-    # n_values = [10, 40, 100, 400, 1000, 4000, 10000] et iterations = 100
-    n_values = [10, 15, 20] 
-    iterations = 5 
+    # ATTENTION: Pour tester, je mets des petites valeurs
+    n_values = [10, 40, 100, 400, 1000, 4000, 10000]
+    #iterations = 100
+    iterations = 5
+    #n_values = [10, 15, 20]
+    #iterations = 5
     
     results = {n: {'theta_NW': [], 'theta_BH': [], 't_NW': [], 't_BH': []} for n in n_values}
     
     for n in n_values:
         print(f"Calculs en cours pour n = {n}...")
         for _ in range(iterations):
+            #print(n, _) # to DEBUG !!!!!!!
             generate_random_tp_file(n, "random_temp")
             
-            # --- 1. Méthode Nord-Ouest ---
+            # --- Method 1 North-West ---
             tp_nw = TransportationProblem("random_temp")
             start_nw = time.process_time()
             with HiddenPrints():
@@ -62,7 +72,7 @@ def run_complexity_study():
             end_ss_nw = time.process_time()
             results[n]['t_NW'].append(end_ss_nw - start_ss_nw)
 
-            # --- 2. Méthode Balas-Hammer ---
+            # --- Method 2 Balas-Hammer ---
             tp_bh = TransportationProblem("random_temp")
             start_bh = time.process_time()
             with HiddenPrints():
@@ -76,20 +86,18 @@ def run_complexity_study():
             end_ss_bh = time.process_time()
             results[n]['t_BH'].append(end_ss_bh - start_ss_bh)
 
-    # Nettoyage
+    # Cleaning
     if os.path.exists("./transportation proposals/random_temp.txt"):
         os.remove("./transportation proposals/random_temp.txt")
 
-    # ==========================================
-    # AFFICHAGE DES GRAPHIQUES SÉPARÉS
-    # ==========================================
+    # Display
     print("Génération des graphiques...")
     
-    # 1. Figure pour les Scatter Plots (Nuages de points)
+    # Figure 1 pour les Scatter Plots (Nuages de points)
     fig1, axs_scatter = plt.subplots(2, 3, figsize=(15, 10))
     fig1.suptitle("Scatter Plots (Toutes itérations)", fontsize=16)
     
-    # 2. Figure pour les Pires Cas (Lignes Maximum)
+    # Figure 2 pour les Pires Cas (Lignes Maximum)
     fig2, axs_max = plt.subplots(2, 3, figsize=(15, 10))
     fig2.suptitle("Worst-Case Complexity (Enveloppe supérieure)", fontsize=16)
     
@@ -147,7 +155,7 @@ def run_complexity_study():
     fig1.tight_layout()
     fig2.tight_layout()
 
-    # 3. Figure finale pour le Ratio de comparaison
+    # Figure 3 finale pour le Ratio de comparaison
     fig3, ax_ratio = plt.subplots(figsize=(8, 5))
     ax_ratio.plot(n_values, ratio_max, marker='s', color='green', linewidth=2)
     ax_ratio.set_title("Comparaison d'efficacité : Ratio (Total NW) / (Total BH)")
@@ -156,6 +164,7 @@ def run_complexity_study():
     ax_ratio.axhline(1, color='black', linestyle='--', linewidth=1) # Ligne de référence à 1
     
     plt.show()
+
 
 if __name__ == "__main__":
     run_complexity_study()
