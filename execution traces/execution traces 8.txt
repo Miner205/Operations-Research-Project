@@ -1,0 +1,385 @@
+"C:\Users\Arthur Donnat\AppData\Local\Programs\Python\Python311\python.exe" "C:\Users\Arthur Donnat\PycharmProjects\Operations Research Project\main.py" 
+Welcome to the transportation problem solver! You can choose from the following transportation problems to solve: 
+1. transportation_problem_1
+2. transportation_problem_2
+3. transportation_problem_3
+4. transportation_problem_4
+5. transportation_problem_5
+6. transportation_problem_6
+7. transportation_problem_7
+8. transportation_problem_8
+9. transportation_problem_9
+10. transportation_problem_10
+11. transportation_problem_11
+12. transportation_problem_12
+13. balas_hammer_tie_cases_test
+14. constraint_table_test
+15. small_table_test
+16. small_table_text2
+17. small_tabme_test_3 
+Please enter the number of the transportation problem you want to solve (or a negative number to exit): 8
+8
+
+                      C1          C2  Provisions
+          P1      50 / 0      20 / 0         100
+          P2      10 / 0      50 / 0         200
+          P3      55 / 0      40 / 0         100
+          P4      35 / 0      45 / 0         200
+          P5      12 / 0       8 / 0         200
+      Orders         300         500
+
+Pick a initial proposal method :
+1 for North-West
+2 for Balas-Hammer/Penalties with Display
+3 for Balas-Hammer/Penalties without Display
+1
+
+Transportation Problem 8 details:
+Nb of suppliers: 5
+Nb of customers: 2
+provisions array: [100, 200, 100, 200, 200]
+orders array: [300, 500]
+costs matrix: 
+ 50, 20
+ 10, 50
+ 55, 40
+ 35, 45
+ 12, 8
+transport proposal matrix: 
+ 100, 0
+ 200, 0
+ 0, 100
+ 0, 200
+ 0, 200
+
+                      C1          C2  Provisions
+          P1    50 / 100    20 /   0         100
+          P2    10 / 200    50 /   0         200
+          P3    55 /   0    40 / 100         100
+          P4    35 /   0    45 / 200         200
+          P5    12 /   0     8 / 200         200
+      Orders         300         500
+
+      C1  C2
+  P1  50  20
+  P2  10  50
+  P3  55  40
+  P4  35  45
+  P5  12   8
+
+                      C1          C2  Provisions
+          P1          50          20         100
+          P2          10          50         200
+          P3          55          40         100
+          P4          35          45         200
+          P5          12           8         200
+      Orders         300         500
+
+        C1   C2
+   P1  100    0
+   P2  200    0
+   P3    0  100
+   P4    0  200
+   P5    0  200
+
+                      C1          C2  Provisions
+          P1         100           0         100
+          P2         200           0         200
+          P3           0         100         100
+          P4           0         200         200
+          P5           0         200         200
+      Orders         300         500
+
+total cost of transport: 21600
+
+        C1   C2
+   P1  100    0
+   P2  200    0
+   P3    0  100
+   P4    0  200
+   P5    0  200
+
+
+There is no cycle
+
+added edge: P5 - C1
+
+The graph is connected
+
+Vertex potentials: [[0, -40, -6, -1, -38], [-50, -46]]
+
+the transportation proposal is sub-optimal
+new improving edge: [0, 1]
+
+Vertex potentials: [[0, -14, 20, 25, -12], [-24, -20]]
+
+the transportation proposal is sub-optimal
+new improving edge: [3, 0]
+
+Vertex potentials: [[0, 0, 20, 25, -12], [-10, -20]]
+
+the transportation proposal is optimal
+
+      C1  C2
+  P1  50  20
+  P2  10   6
+  P3  44  40
+  P4  35  45
+  P5  12   8
+
+      C1  C2
+  P1   0   0
+  P2   0  44
+  P3  11   0
+  P4   0   0
+  P5   0   0
+
+        C1   C2
+   P1    0  100
+   P2  200    0
+   P3    0  100
+   P4  100  100
+   P5    0  200
+
+I hope you enjoyed solving that transportation problem! If you want to solve another one, please enter the number of the transportation problem you want to solve (or a negative number to exit): 8
+
+                      C1          C2  Provisions
+          P1      50 / 0      20 / 0         100
+          P2      10 / 0      50 / 0         200
+          P3      55 / 0      40 / 0         100
+          P4      35 / 0      45 / 0         200
+          P5      12 / 0       8 / 0         200
+      Orders         300         500
+
+Pick a initial proposal method :
+1 for North-West
+2 for Balas-Hammer/Penalties with Display
+3 for Balas-Hammer/Penalties without Display
+2
+Penalties of rows : [30, 40, 15, 10, 4]
+Penalties of columns : [2, 12]
+                      C1          C2  Provisions     Penalty
+          P1      50 / 0      20 / 0         100          30
+          P2      10 / 0      50 / 0         200          40
+          P3      55 / 0      40 / 0         100          15
+          P4      35 / 0      45 / 0         200          10
+          P5      12 / 0       8 / 0         200           4
+      Orders         300         500
+     Penalty           2          12
+transport proposal matrix: [[0, 0], [200, 0], [0, 0], [0, 0], [0, 0]]
+costs matrix: [[50, 20], [10, 50], [55, 40], [35, 45], [12, 8]]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 /   0         100          30
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 /   0         100          15
+          P4    35 /   0    45 /   0         200          10
+          P5    12 /   0     8 /   0         200           4
+      Orders         300         500
+     Penalty           2          12
+
+Penalties of rows : [30, -1, 15, 10, 4]
+Penalties of columns : [23, 12]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 /   0         100          30
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 /   0         100          15
+          P4    35 /   0    45 /   0         200          10
+          P5    12 /   0     8 /   0         200           4
+      Orders         300         500
+     Penalty          23          12
+transport proposal matrix: [[0, 100], [200, 0], [0, 0], [0, 0], [0, 0]]
+costs matrix: [[50, 20], [10, 50], [55, 40], [35, 45], [12, 8]]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 / 100         100          -1
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 /   0         100          15
+          P4    35 /   0    45 /   0         200          10
+          P5    12 /   0     8 /   0         200           4
+      Orders         300         500
+     Penalty          23          12
+
+Penalties of rows : [-1, -1, 15, 10, 4]
+Penalties of columns : [23, 32]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 / 100         100          -1
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 /   0         100          15
+          P4    35 /   0    45 /   0         200          10
+          P5    12 /   0     8 /   0         200           4
+      Orders         300         500
+     Penalty          23          32
+transport proposal matrix: [[0, 100], [200, 0], [0, 0], [0, 0], [0, 200]]
+costs matrix: [[50, 20], [10, 50], [55, 40], [35, 45], [12, 8]]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 / 100         100          -1
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 /   0         100          15
+          P4    35 /   0    45 /   0         200          10
+          P5    12 /   0     8 / 200         200          -1
+      Orders         300         500
+     Penalty          23          32
+
+Penalties of rows : [-1, -1, 15, 10, -1]
+Penalties of columns : [20, 5]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 / 100         100          -1
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 /   0         100          15
+          P4    35 /   0    45 /   0         200          10
+          P5    12 /   0     8 / 200         200          -1
+      Orders         300         500
+     Penalty          20           5
+transport proposal matrix: [[0, 100], [200, 0], [0, 0], [100, 0], [0, 200]]
+costs matrix: [[50, 20], [10, 50], [55, 40], [35, 45], [12, 8]]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 / 100         100          -1
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 /   0         100          15
+          P4    35 / 100    45 /   0         200          10
+          P5    12 /   0     8 / 200         200          -1
+      Orders         300         500
+     Penalty          -1           5
+
+Penalties of rows : [-1, -1, inf, inf, -1]
+Penalties of columns : [-1, 5]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 / 100         100          -1
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 /   0         100         inf
+          P4    35 / 100    45 /   0         200         inf
+          P5    12 /   0     8 / 200         200          -1
+      Orders         300         500
+     Penalty          -1           5
+transport proposal matrix: [[0, 100], [200, 0], [0, 100], [100, 0], [0, 200]]
+costs matrix: [[50, 20], [10, 50], [55, 40], [35, 45], [12, 8]]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 / 100         100          -1
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 / 100         100          -1
+          P4    35 / 100    45 /   0         200         inf
+          P5    12 /   0     8 / 200         200          -1
+      Orders         300         500
+     Penalty          -1           5
+
+Penalties of rows : [-1, -1, -1, inf, -1]
+Penalties of columns : [-1, inf]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 / 100         100          -1
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 / 100         100          -1
+          P4    35 / 100    45 /   0         200         inf
+          P5    12 /   0     8 / 200         200          -1
+      Orders         300         500
+     Penalty          -1         inf
+transport proposal matrix: [[0, 100], [200, 0], [0, 100], [100, 100], [0, 200]]
+costs matrix: [[50, 20], [10, 50], [55, 40], [35, 45], [12, 8]]
+                      C1          C2  Provisions     Penalty
+          P1    50 /   0    20 / 100         100          -1
+          P2    10 / 200    50 /   0         200          -1
+          P3    55 /   0    40 / 100         100          -1
+          P4    35 / 100    45 / 100         200          -1
+          P5    12 /   0     8 / 200         200          -1
+      Orders         300         500
+     Penalty          -1          -1
+
+
+Transportation Problem 8 details:
+Nb of suppliers: 5
+Nb of customers: 2
+provisions array: [100, 200, 100, 200, 200]
+orders array: [300, 500]
+costs matrix: 
+ 50, 20
+ 10, 50
+ 55, 40
+ 35, 45
+ 12, 8
+transport proposal matrix: 
+ 0, 100
+ 200, 0
+ 0, 100
+ 100, 100
+ 0, 200
+
+                      C1          C2  Provisions
+          P1    50 /   0    20 / 100         100
+          P2    10 / 200    50 /   0         200
+          P3    55 /   0    40 / 100         100
+          P4    35 / 100    45 / 100         200
+          P5    12 /   0     8 / 200         200
+      Orders         300         500
+
+      C1  C2
+  P1  50  20
+  P2  10  50
+  P3  55  40
+  P4  35  45
+  P5  12   8
+
+                      C1          C2  Provisions
+          P1          50          20         100
+          P2          10          50         200
+          P3          55          40         100
+          P4          35          45         200
+          P5          12           8         200
+      Orders         300         500
+
+        C1   C2
+   P1    0  100
+   P2  200    0
+   P3    0  100
+   P4  100  100
+   P5    0  200
+
+                      C1          C2  Provisions
+          P1           0         100         100
+          P2         200           0         200
+          P3           0         100         100
+          P4         100         100         200
+          P5           0         200         200
+      Orders         300         500
+
+total cost of transport: 17600
+
+        C1   C2
+   P1    0  100
+   P2  200    0
+   P3    0  100
+   P4  100  100
+   P5    0  200
+
+
+There is no cycle
+
+The graph is connected
+
+Vertex potentials: [[0, 0, 20, 25, -12], [-10, -20]]
+
+the transportation proposal is optimal
+
+      C1  C2
+  P1  10  20
+  P2  10  20
+  P3  30  40
+  P4  35  45
+  P5  -2   8
+
+      C1  C2
+  P1  40   0
+  P2   0  30
+  P3  25   0
+  P4   0   0
+  P5  14   0
+
+        C1   C2
+   P1    0  100
+   P2  200    0
+   P3    0  100
+   P4  100  100
+   P5    0  200
+
+I hope you enjoyed solving that transportation problem! If you want to solve another one, please enter the number of the transportation problem you want to solve (or a negative number to exit): -1
+Exiting the program...
+You have exited the program. Goodbye!
+
+Process finished with exit code 0

@@ -1,0 +1,209 @@
+"C:\Users\Arthur Donnat\AppData\Local\Programs\Python\Python311\python.exe" "C:\Users\Arthur Donnat\PycharmProjects\Operations Research Project\main.py" 
+Welcome to the transportation problem solver! You can choose from the following transportation problems to solve: 
+1. transportation_problem_1
+2. transportation_problem_2
+3. transportation_problem_3
+4. transportation_problem_4
+5. transportation_problem_5
+6. transportation_problem_6
+7. transportation_problem_7
+8. transportation_problem_8
+9. transportation_problem_9
+10. transportation_problem_10
+11. transportation_problem_11
+12. transportation_problem_12
+13. balas_hammer_tie_cases_test
+14. constraint_table_test
+15. small_table_test
+16. small_table_text2
+17. small_tabme_test_3 
+Please enter the number of the transportation problem you want to solve (or a negative number to exit): 2
+2
+
+                      C1          C2  Provisions
+          P1      10 / 0      20 / 0         100
+          P2      30 / 0      10 / 0         100
+      Orders         100         100
+
+Pick a initial proposal method :
+1 for North-West
+2 for Balas-Hammer/Penalties with Display
+3 for Balas-Hammer/Penalties without Display
+1
+
+Transportation Problem 2 details:
+Nb of suppliers: 2
+Nb of customers: 2
+provisions array: [100, 100]
+orders array: [100, 100]
+costs matrix: 
+ 10, 20
+ 30, 10
+transport proposal matrix: 
+ 100, 0
+ 0, 100
+
+                      C1          C2  Provisions
+          P1    10 / 100    20 /   0         100
+          P2    30 /   0    10 / 100         100
+      Orders         100         100
+
+      C1  C2
+  P1  10  20
+  P2  30  10
+
+                      C1          C2  Provisions
+          P1          10          20         100
+          P2          30          10         100
+      Orders         100         100
+
+        C1   C2
+   P1  100    0
+   P2    0  100
+
+                      C1          C2  Provisions
+          P1         100           0         100
+          P2           0         100         100
+      Orders         100         100
+
+total cost of transport: 2000
+
+        C1   C2
+   P1  100    0
+   P2    0  100
+
+
+There is no cycle
+
+added edge: P1 - C2
+
+The graph is connected
+
+Vertex potentials: [[0, -10], [-10, -20]]
+
+the transportation proposal is optimal
+
+      C1  C2
+  P1  10  20
+  P2   0  10
+
+      C1  C2
+  P1   0   0
+  P2  30   0
+
+        C1   C2
+   P1  100    0
+   P2    0  100
+
+I hope you enjoyed solving that transportation problem! If you want to solve another one, please enter the number of the transportation problem you want to solve (or a negative number to exit): 2
+
+                      C1          C2  Provisions
+          P1      10 / 0      20 / 0         100
+          P2      30 / 0      10 / 0         100
+      Orders         100         100
+
+Pick a initial proposal method :
+1 for North-West
+2 for Balas-Hammer/Penalties with Display
+3 for Balas-Hammer/Penalties without Display
+2
+Penalties of rows : [10, 20]
+Penalties of columns : [20, 10]
+                      C1          C2  Provisions     Penalty
+          P1      10 / 0      20 / 0         100          10
+          P2      30 / 0      10 / 0         100          20
+      Orders         100         100
+     Penalty          20          10
+transport proposal matrix: [[100, 0], [0, 0]]
+costs matrix: [[10, 20], [30, 10]]
+                      C1          C2  Provisions     Penalty
+          P1    10 / 100    20 /   0         100          -1
+          P2    30 /   0    10 /   0         100          20
+      Orders         100         100
+     Penalty          -1          10
+
+Penalties of rows : [-1, inf]
+Penalties of columns : [-1, inf]
+                      C1          C2  Provisions     Penalty
+          P1    10 / 100    20 /   0         100          -1
+          P2    30 /   0    10 /   0         100         inf
+      Orders         100         100
+     Penalty          -1         inf
+transport proposal matrix: [[100, 0], [0, 100]]
+costs matrix: [[10, 20], [30, 10]]
+                      C1          C2  Provisions     Penalty
+          P1    10 / 100    20 /   0         100          -1
+          P2    30 /   0    10 / 100         100          -1
+      Orders         100         100
+     Penalty          -1          -1
+
+
+Transportation Problem 2 details:
+Nb of suppliers: 2
+Nb of customers: 2
+provisions array: [100, 100]
+orders array: [100, 100]
+costs matrix: 
+ 10, 20
+ 30, 10
+transport proposal matrix: 
+ 100, 0
+ 0, 100
+
+                      C1          C2  Provisions
+          P1    10 / 100    20 /   0         100
+          P2    30 /   0    10 / 100         100
+      Orders         100         100
+
+      C1  C2
+  P1  10  20
+  P2  30  10
+
+                      C1          C2  Provisions
+          P1          10          20         100
+          P2          30          10         100
+      Orders         100         100
+
+        C1   C2
+   P1  100    0
+   P2    0  100
+
+                      C1          C2  Provisions
+          P1         100           0         100
+          P2           0         100         100
+      Orders         100         100
+
+total cost of transport: 2000
+
+        C1   C2
+   P1  100    0
+   P2    0  100
+
+
+There is no cycle
+
+added edge: P1 - C2
+
+The graph is connected
+
+Vertex potentials: [[0, -10], [-10, -20]]
+
+the transportation proposal is optimal
+
+      C1  C2
+  P1  10  20
+  P2   0  10
+
+      C1  C2
+  P1   0   0
+  P2  30   0
+
+        C1   C2
+   P1  100    0
+   P2    0  100
+
+I hope you enjoyed solving that transportation problem! If you want to solve another one, please enter the number of the transportation problem you want to solve (or a negative number to exit): -1
+Exiting the program...
+You have exited the program. Goodbye!
+
+Process finished with exit code 0
