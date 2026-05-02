@@ -4,7 +4,7 @@ first_message = "Welcome to the transportation problem solver! You can choose fr
 redo_message = "I hope you enjoyed solving that transportation problem! If you want to solve another one, please enter the number of the transportation problem you want to solve (or a negative number to exit): "
 tp_number = 0
 indexes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'balas_hammer_tie_cases_test', 'constraint_table_test', 'small_table_test', 'small_table_text2', 'small_tabme_test_3']
-c=0
+c = 0
 while tp_number >= 0:
     while tp_number == 0:
         if c == 0:
@@ -12,14 +12,14 @@ while tp_number >= 0:
             print(tp_number)
         else:
             tp_number = int(input(redo_message))
-        if tp_number < len(indexes) and tp_number >0:
-            tp = TransportationProblem(str(indexes[tp_number-1]))
+        if tp_number < len(indexes) and tp_number > 0:
+            tp = TransportationProblem(str(indexes[tp_number - 1]))
         elif tp_number < 0:
             print('Exiting the program...')
             pass
         else:
             print("That transportation problem doesn't exist. Please try again.")
-            tp_number = 0 # Putting an input here will make the program go out of the while, without initializing the tp variable. Putting at 0 will iterate back at the start of the loop
+            tp_number = 0  # Putting an input here will make the program go out of the while, without initializing the tp variable. Putting at 0 will iterate back at the start of the loop
     if tp_number >= 0:
         print()
         tp.display_full_transportation_problem_with_proposal()
@@ -47,5 +47,35 @@ while tp_number >= 0:
         print("total cost of transport:", tp.total_cost_calculation())
 
         tp_number = 0
-        c+=1
+        c += 1
+
+        """print()
+        tp.transport_proposal_matrix = [[60, 0, 0], [0, 20, 20], [0, 40, 80]]
+        tp.transport_proposal_matrix = [[60, 0, 0], [50, 20, 0], [80, 40, 0]]
+        tp.display_matrix(tp.transport_proposal_matrix)
+        additional_edges = tp.test_degenerate()
+        print()
+        tp.display_matrix(tp.transport_proposal_matrix)
+        tp.compute_potential_marginal_costs(additional_edges)
+        print()
+        tp.display_matrix(tp.costs_matrix)
+        print()
+        tp.display_matrix(tp.potential_costs_matrix)
+        print()
+        tp.display_matrix(tp.marginal_costs_matrix)"""
+        #print()
+        #tp.transport_proposal_matrix = [[60, 0, 0], [50, 20, 0], [80, 40, 0]]
+        print()
+        tp.display_matrix(tp.transport_proposal_matrix)
+        print()
+        tp.stepping_stone()
+        print()
+        tp.display_matrix(tp.potential_costs_matrix)
+        print()
+        tp.display_matrix(tp.marginal_costs_matrix)
+        print()
+        tp.display_matrix(tp.transport_proposal_matrix)
+        print()
+
+
 print("You have exited the program. Goodbye!")

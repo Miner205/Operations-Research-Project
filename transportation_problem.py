@@ -9,6 +9,8 @@ class TransportationProblem:
         self.costs_matrix: list[list[int]] = []  # A ; unit costs (displayed in blue)
         self.load_tp_x(x)
         self.transport_proposal_matrix = [[0 for _ in range(self.nb_customers)] for _ in range(self.nb_suppliers)]  # B
+        self.potential_costs_matrix = [[0 for _ in range(self.nb_customers)] for _ in range(self.nb_suppliers)]
+        self.marginal_costs_matrix = [[0 for _ in range(self.nb_customers)] for _ in range(self.nb_suppliers)]
 
     def __str__(self):
         return ("Transportation Problem " + self.name + " details:\n" +
@@ -382,6 +384,284 @@ class TransportationProblem:
                 print()
 
         # end while loop / Balas-Hammer
+
+    def path_to_root(self, parents, current_vertex):
+        path = []
+        while current_vertex is not None:
+            path.append(current_vertex)
+            current_vertex = parents[current_vertex]
+        return path
+
+    def reconstitute_cycle(self, parents, current_vertex, cycle_vertex):
+        cycle_path = self.path_to_root(parents, cycle_vertex)
+        path_current = self.path_to_root(parents, current_vertex)
+        i = len(cycle_path) - 1
+        j = len(path_current) - 1
+        while i >= 0 and j >= 0 and cycle_path[i] == path_current[j]:
+            i -= 1
+            j -= 1
+        return cycle_path[:i + 1] + path_current[j + 1::-1] + [cycle_vertex]
+
+    def search_cycle(self, additional_edges):
+        visited_global = set()
+        cycle = []
+        while len(visited_global) < self.nb_suppliers + self.nb_customers and not cycle:
+            initial_vertex = (0, 0)
+            while initial_vertex[1] < self.nb_suppliers - 1 and initial_vertex in visited_global:
+                initial_vertex = (0, initial_vertex[1] + 1)
+            if initial_vertex in visited_global:
+                initial_vertex = (1, 0)
+                while initial_vertex[1] < self.nb_customers - 1 and initial_vertex in visited_global:
+                    initial_vertex = (1, initial_vertex[1] + 1)
+            parents = {initial_vertex: None}
+            queue = [initial_vertex]
+            print(queue)
+            head = 0
+            visited = {queue[head]}
+            while head < len(queue):
+                current_vertex = queue[head]
+                if current_vertex[0] == 0:
+                    for customer_nb in range(self.nb_customers):
+                        if ((self.transport_proposal_matrix[current_vertex[1]][customer_nb] != 0 or [current_vertex[1], customer_nb] in additional_edges)
+                                and (1, customer_nb) != parents.get(current_vertex)):
+                            if (1, customer_nb) in visited:
+                                cycle = self.reconstitute_cycle(parents, current_vertex, (1, customer_nb))
+                            else:
+                                queue.append((1, customer_nb))
+                                visited.add((1, customer_nb))
+                                parents[(1, customer_nb)] = current_vertex
+                else:
+                    for supplier_nb in range(self.nb_suppliers):
+                        if ((self.transport_proposal_matrix[supplier_nb][current_vertex[1]] != 0 or [supplier_nb, current_vertex[1]] in additional_edges)
+                                and (0, supplier_nb) != parents.get(current_vertex)):
+                            if (0, supplier_nb) in visited:
+                                cycle = self.reconstitute_cycle(parents, current_vertex, (0, supplier_nb))
+                            else:
+                                queue.append((0, supplier_nb))
+                                visited.add((0, supplier_nb))
+                                parents[(0, supplier_nb)] = current_vertex
+                head += 1
+            if initial_vertex == (0, 0):
+                connected = visited
+            visited_global.update(visited)
+        return cycle, connected
+
+    def supress_cycle(self, cycle):
+        delta = float('inf')
+        for vertex_nb in range(len(cycle) - 1):
+            if vertex_nb % 2 == 1:
+                current = cycle[vertex_nb]
+                next_vertex = cycle[vertex_nb + 1]
+                if current[0] == 0:
+                    delta = min(delta, self.transport_proposal_matrix[current[1]][next_vertex[1]])
+                else:
+                    delta = min(delta, self.transport_proposal_matrix[next_vertex[1]][current[1]])
+
+        removed_edges = []
+        for vertex_nb in range(len(cycle) - 1):
+            current = cycle[vertex_nb]
+            next_vertex = cycle[vertex_nb + 1]
+            if vertex_nb % 2 == 0:
+                if current[0] == 0:
+                    self.transport_proposal_matrix[current[1]][next_vertex[1]] += delta
+                else:
+                    self.transport_proposal_matrix[next_vertex[1]][current[1]] += delta
+            else:
+                if current[0] == 0:
+                    self.transport_proposal_matrix[current[1]][next_vertex[1]] -= delta
+                    if self.transport_proposal_matrix[current[1]][next_vertex[1]] == 0:
+                        removed_edges.append([current, next_vertex])
+                else:
+                    self.transport_proposal_matrix[next_vertex[1]][current[1]] -= delta
+                    if self.transport_proposal_matrix[next_vertex[1]][current[1]] == 0:
+                        removed_edges.append([next_vertex, current])
+        return delta, removed_edges
+
+    def test_connectivity(self, visited):
+        not_connected = []
+        for supplier_nb in range(self.nb_suppliers):
+            if (0, supplier_nb) not in visited:
+                not_connected.append((0, supplier_nb))
+        for customer_nb in range(self.nb_customers):
+            if (1, customer_nb) not in visited:
+                not_connected.append((1, customer_nb))
+        return not_connected
+
+    def connect_graph(self, visited, not_connected):
+        lowest_cost = float('inf')
+        vertex_nb = 0
+        while vertex_nb < len(not_connected):
+            current = not_connected[vertex_nb]
+            if current[0] == 0:
+                for customer_nb in range(self.nb_customers):
+                    if (1, customer_nb) in visited and self.costs_matrix[current[1]][customer_nb] < lowest_cost:
+                        self.transport_proposal_matrix[current[1]][customer_nb] = 1
+                        cycle_test, visited_test = self.search_cycle([])
+                        if not cycle_test:
+                            lowest_cost = self.costs_matrix[current[1]][customer_nb]
+                            added_edge = [current[1], customer_nb]
+                            new_visited = visited_test
+                            self.transport_proposal_matrix[current[1]][customer_nb] = 0
+            else:
+                for supplier_nb in range(self.nb_suppliers):
+                    if (0, supplier_nb) in visited and self.costs_matrix[supplier_nb][current[1]] < lowest_cost:
+                        self.transport_proposal_matrix[supplier_nb][current[1]] = 1
+                        cycle_test, visited_test = self.search_cycle([])
+                        if not cycle_test:
+                            lowest_cost = self.costs_matrix[supplier_nb][current[1]]
+                            added_edge = [supplier_nb, current[1]]
+                            new_visited = visited_test
+                            self.transport_proposal_matrix[supplier_nb][current[1]] = 0
+            vertex_nb += 1
+        return added_edge, new_visited
+
+    def test_degenerate(self):
+        cycle = ["initialization"]
+        while cycle:
+            cycle, visited = self.search_cycle([])
+            if cycle:
+                print()
+                print("The graph contain a cycle:")
+                first_vertex = True
+                for vertex in cycle:
+                    if first_vertex is True:
+                        first_vertex = False
+                    else:
+                        print("-", end=" ")
+                    if vertex[0] == 0:
+                        print(end="P")
+                    else:
+                        print(end="C")
+                    print(vertex[1] + 1, end=" ")
+                print()
+                delta, removed_edges = self.supress_cycle(cycle)
+                print()
+                print("delta =", delta)
+                print("removed edges:")
+                for removed_edge in removed_edges:
+                    print("P" + str(removed_edge[0][1] + 1) + " - C" + str(removed_edge[1][1] + 1))
+            else:
+                print()
+                print("There is no cycle")
+
+        not_connected = ["initialization"]
+        additional_edges = []
+        while not_connected:
+            not_connected = self.test_connectivity(visited)
+            if not_connected:
+                added_edge, visited = self.connect_graph(visited, not_connected)
+                self.transport_proposal_matrix[added_edge[0]][added_edge[1]] = 1
+                print()
+                print("added edge: P" + str(added_edge[0] + 1) + " - C" + str(added_edge[1] + 1))
+                additional_edges.append(added_edge)
+            else:
+                for edge_added in additional_edges:
+                    self.transport_proposal_matrix[edge_added[0]][edge_added[1]] = 0
+                print()
+                print("The graph is connected")
+
+        return additional_edges
+
+    def compute_potential_marginal_costs(self, additional_edges):
+        parents = {(0, 0): None}
+        queue = [(0, 0)]
+        head = 0
+        visited = {queue[head]}
+        vertex_potentials = [[0]*self.nb_suppliers, [0]*self.nb_customers]
+        while head < len(queue):
+            current_vertex = queue[head]
+            if current_vertex[0] == 0:
+                for customer_nb in range(self.nb_customers):
+                    if ((self.transport_proposal_matrix[current_vertex[1]][customer_nb] != 0 or [current_vertex[1], customer_nb] in additional_edges)
+                            and (1, customer_nb) != parents.get(current_vertex)):
+                        queue.append((1, customer_nb))
+                        visited.add((1, customer_nb))
+                        parents[(1, customer_nb)] = current_vertex
+                        self.marginal_costs_matrix[current_vertex[1]][customer_nb] = 0
+                        self.potential_costs_matrix[current_vertex[1]][customer_nb] = self.costs_matrix[current_vertex[1]][customer_nb]
+                        vertex_potentials[1][customer_nb] = -self.potential_costs_matrix[current_vertex[1]][customer_nb] + vertex_potentials[0][current_vertex[1]]
+            else:
+                for supplier_nb in range(self.nb_suppliers):
+                    if ((self.transport_proposal_matrix[supplier_nb][current_vertex[1]] != 0 or [supplier_nb, current_vertex[1]] in additional_edges)
+                            and (0, supplier_nb) != parents.get(current_vertex)):
+                        queue.append((0, supplier_nb))
+                        visited.add((0, supplier_nb))
+                        parents[(0, supplier_nb)] = current_vertex
+                        self.marginal_costs_matrix[supplier_nb][current_vertex[1]] = 0
+                        self.potential_costs_matrix[supplier_nb][current_vertex[1]] = self.costs_matrix[supplier_nb][current_vertex[1]]
+                        vertex_potentials[0][supplier_nb] = self.potential_costs_matrix[supplier_nb][current_vertex[1]] + vertex_potentials[1][current_vertex[1]]
+            head += 1
+        print()
+        print(vertex_potentials)
+
+        for supplier_nb in range(self.nb_suppliers):
+            for customer_nb in range(self.nb_customers):
+                if self.potential_costs_matrix[supplier_nb][customer_nb] == 0:
+                    self.potential_costs_matrix[supplier_nb][customer_nb] = vertex_potentials[0][supplier_nb] - vertex_potentials[1][customer_nb]
+                    self.marginal_costs_matrix[supplier_nb][customer_nb] = self.costs_matrix[supplier_nb][customer_nb] - self.potential_costs_matrix[supplier_nb][customer_nb]
+
+    def test_optimal(self):
+        lowest_marginal_cost = 0
+        new_edge = []
+        for supplier_nb in range(self.nb_suppliers):
+            for customer_nb in range(self.nb_customers):
+                if self.marginal_costs_matrix[supplier_nb][customer_nb] < lowest_marginal_cost:
+                    new_edge = [supplier_nb, customer_nb]
+        return new_edge
+
+    def add_improving_edge(self, cycle, new_edge):
+        delta = float('inf')
+        for vertex_nb in range(len(cycle) - 1):
+            if vertex_nb % 2 == 1:
+                current = cycle[vertex_nb]
+                next_vertex = cycle[vertex_nb + 1]
+                print(next_vertex)
+                if current[0] == 0 and self.transport_proposal_matrix[current[1]][next_vertex[1]] != 0:
+                    delta = min(delta, self.transport_proposal_matrix[current[1]][next_vertex[1]])
+                elif self.transport_proposal_matrix[next_vertex[1]][current[1]] != 0:
+                    delta = min(delta, self.transport_proposal_matrix[next_vertex[1]][current[1]])
+
+        removed_edges = []
+        for vertex_nb in range(len(cycle) - 1):
+            current = cycle[vertex_nb]
+            next_vertex = cycle[vertex_nb + 1]
+            if vertex_nb % 2 == 0:
+                if current[0] == 0:
+                    self.transport_proposal_matrix[current[1]][next_vertex[1]] += delta
+                else:
+                    self.transport_proposal_matrix[next_vertex[1]][current[1]] += delta
+            else:
+                if current[0] == 0:
+                    self.transport_proposal_matrix[current[1]][next_vertex[1]] -= delta
+                    if self.transport_proposal_matrix[current[1]][next_vertex[1]] == 0:
+                        removed_edges.append([current, next_vertex])
+                else:
+                    self.transport_proposal_matrix[next_vertex[1]][current[1]] -= delta
+                    if self.transport_proposal_matrix[next_vertex[1]][current[1]] == 0:
+                        removed_edges.append([next_vertex, current])
+        print(delta)
+        print(removed_edges)
+        return delta, removed_edges
+
+    def stepping_stone(self):
+        additional_edges = self.test_degenerate()
+        self.compute_potential_marginal_costs(additional_edges)
+        new_edge = self.test_optimal()
+        while new_edge:
+            print()
+            print("the transportation proposal is sub-optimal")
+            additional_edges.append(new_edge)
+            cycle, visited = self.search_cycle(additional_edges)
+            print(new_edge)
+            print(cycle)
+            delta, removed_edges = self.add_improving_edge(cycle, new_edge)
+            for removed_edge in removed_edges:
+                if [removed_edge[0][1], removed_edge[1][1]] in additional_edges:
+                    additional_edges.remove([removed_edge[0][1], removed_edge[1][1]])
+            self.compute_potential_marginal_costs(additional_edges)
+            new_edge = self.test_optimal()
+        print()
+        print("the transportation proposal is optimal")
 
 
 def show_n_t(x: str) -> None:  # Just to verify than the 'save_tp_as_x' method works correctly.
