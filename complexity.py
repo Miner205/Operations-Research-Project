@@ -44,10 +44,10 @@ def generate_random_tp_file(n, filename="random_temp"):
 
 def run_complexity_study():
     # ATTENTION: Pour tester, je mets des petites valeurs
-    n_values = [10, 40, 100, 400, 1000, 4000, 10000]
+    #n_values = [10, 40, 100, 400, 1000, 4000, 10000]
     #iterations = 100
-    iterations = 5
-    #n_values = [10, 15, 20]
+    iterations = 10
+    n_values = [10, 20, 30, 40]
     #iterations = 5
     
     results = {n: {'theta_NW': [], 'theta_BH': [], 't_NW': [], 't_BH': []} for n in n_values}
@@ -55,7 +55,7 @@ def run_complexity_study():
     for n in n_values:
         print(f"Calculs en cours pour n = {n}...")
         for _ in range(iterations):
-            #print(n, _) # to DEBUG !!!!!!!
+            print(n, _) # to DEBUG !!!!!!!
             generate_random_tp_file(n, "random_temp")
             
             # --- Method 1 North-West ---
@@ -68,7 +68,7 @@ def run_complexity_study():
             
             start_ss_nw = time.process_time()
             with HiddenPrints():
-                tp_nw.stepping_stone()
+                tp_nw.stepping_stone(with_display=False)
             end_ss_nw = time.process_time()
             results[n]['t_NW'].append(end_ss_nw - start_ss_nw)
 
@@ -82,7 +82,7 @@ def run_complexity_study():
 
             start_ss_bh = time.process_time()
             with HiddenPrints():
-                tp_bh.stepping_stone()
+                tp_bh.stepping_stone(with_display=False)
             end_ss_bh = time.process_time()
             results[n]['t_BH'].append(end_ss_bh - start_ss_bh)
 
