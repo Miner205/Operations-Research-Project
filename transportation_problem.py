@@ -1,4 +1,3 @@
-
 class TransportationProblem:
     def __init__(self, x: str):
         self.name: str = x
@@ -67,31 +66,21 @@ class TransportationProblem:
         return t
 
     def display_matrix(self, matrix, aesthetic_spaces=1, is_costs_matrix=False, with_provisions_and_orders=False) -> None:
-        """
-        display the matrix.
-
-        :param matrix: self.costs_matrix, self.transport_proposal_matrix,
-         ... and probably also "Potential costs table" and "Marginal costs table" - à tester quand on les aura.
-        :param aesthetic_spaces: int ; nb of additional spaces for decoration.
-        :param is_costs_matrix: to display costs in blue (by convention).
-        :param with_provisions_and_orders: to also display provisions and orders.
-        :return: Nothing.
-        """
         max_char_size = 0
         for i in range(self.nb_suppliers):
             for j in range(self.nb_customers):
                 size_char = len(str(matrix[i][j]))
                 if size_char > max_char_size:
                     max_char_size = size_char
-        max_char_size = max(max_char_size, len(str(self.nb_suppliers - 1)) + 1)  # + 1 for len('P')
-        max_char_size = max(max_char_size, len(str(self.nb_customers - 1)) + 1)  # + 1 for len('C')
+        max_char_size = max(max_char_size, len(str(self.nb_suppliers - 1)) + 1)
+        max_char_size = max(max_char_size, len(str(self.nb_customers - 1)) + 1)
         if with_provisions_and_orders:
-            max_char_size = max(max_char_size, 10)  # 10 for len("Provisions") ; also for len("Orders")
+            max_char_size = max(max_char_size, 10)
         max_char_size += 1 + aesthetic_spaces
 
         print(" " * max_char_size, end="")
         for k in range(self.nb_customers):
-            print(f"{'C' + str(k+1):>{max_char_size}}", end="")  # align to the right with a maximum width of max_char_size
+            print(f"{'C' + str(k+1):>{max_char_size}}", end="")
         if with_provisions_and_orders:
             print(f"{'Provisions':>{max_char_size}}", end="")
         print()
@@ -102,8 +91,8 @@ class TransportationProblem:
                 s = str(matrix[i][j])
                 l_s = 0
                 if is_costs_matrix:
-                    s = '\033[1;34;48m {}\033[0m'.format(matrix[i][j])  # to display the costs in blue.
-                    l_s = 14  # adjusting to work with colored text like it would without the colored text.
+                    s = '\033[1;34;48m {}\033[0m'.format(matrix[i][j])
+                    l_s = 14
                 print(f"{s:>{max_char_size+l_s}}", end="")
             if with_provisions_and_orders:
                 print(f"{self.provisions[i]:>{max_char_size}}", end="")
@@ -116,26 +105,16 @@ class TransportationProblem:
             print()
 
     def display_full_transportation_problem_with_proposal(self, aesthetic_spaces=1, balas_hammer=None, penalties=None, penalty_equalities=None):
-        """
-        display the transportation problem: it's costs, transport proposal, provisions and orders.
-        note: display costs in blue (by convention).
-
-        :param aesthetic_spaces: int ; nb of additional spaces for decoration.
-        :param balas_hammer: "Display of row(s) (or columns) with the maximum penalty" -> put it in color.
-        :param penalties: to display penalties.
-        :param penalty_equalities: to display in a different color the rows or cols with same penalty value than the maximum penalty.
-        :return: Nothing.
-        """
         max_char_size, max_prop_size = 0, 0
         for i in range(self.nb_suppliers):
             for j in range(self.nb_customers):
                 max_prop_size = max(max_prop_size, len(str(self.transport_proposal_matrix[i][j])))
-                size_char = len(str(self.costs_matrix[i][j])) + 3 + len(str(self.transport_proposal_matrix[i][j]))  # + 1 for len(' / ')
+                size_char = len(str(self.costs_matrix[i][j])) + 3 + len(str(self.transport_proposal_matrix[i][j]))
                 if size_char > max_char_size:
                     max_char_size = size_char
-        max_char_size = max(max_char_size, len(str(self.nb_suppliers - 1)) + 1)  # + 1 for len('P')
-        max_char_size = max(max_char_size, len(str(self.nb_customers - 1)) + 1)  # + 1 for len('C')
-        max_char_size = max(max_char_size, 10)  # 10 for len("Provisions") ; also for len("Orders") ; and also for len("Penalty")
+        max_char_size = max(max_char_size, len(str(self.nb_suppliers - 1)) + 1)
+        max_char_size = max(max_char_size, len(str(self.nb_customers - 1)) + 1)
+        max_char_size = max(max_char_size, 10)
         max_char_size += 1 + aesthetic_spaces
 
         print(" " * max_char_size, end="")
@@ -149,33 +128,32 @@ class TransportationProblem:
         for i in range(self.nb_suppliers):
             print(f"{'P' + str(i + 1):>{max_char_size}}", end="")
             for j in range(self.nb_customers):
-                # text color info : https://www.geeksforgeeks.org/python/print-colors-python-terminal/
-                s = '\033[1;34;48m {}\033[0m'.format(self.costs_matrix[i][j])  # to display the costs in blue.
-                l_s = 14  # adjusting to work with colored text like it would without the colored text.
+                s = '\033[1;34;48m {}\033[0m'.format(self.costs_matrix[i][j])
+                l_s = 14
                 print(f"{s + ' / ':>{max_char_size+l_s-max_prop_size}}", end="")
                 s_balas = str(self.transport_proposal_matrix[i][j])
                 l_s_balas = 0
                 if penalty_equalities:
                     for elt in penalty_equalities:
                         if elt[0] == "col" and elt[1] == j:
-                            s_balas = '\033[1;33;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in yellow.
+                            s_balas = '\033[1;33;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])
                             l_s_balas = 14
                         elif elt[0] == "row" and elt[1] == i:
-                            s_balas = '\033[1;33;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in yellow.
+                            s_balas = '\033[1;33;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])
                             l_s_balas = 14
                 if balas_hammer:
-                    if balas_hammer[0] and j == balas_hammer[2]:  # = max penalty in a col
-                        s_balas = '\033[1;31;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red.
+                    if balas_hammer[0] and j == balas_hammer[2]:
+                        s_balas = '\033[1;31;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])
                         l_s_balas = 14
-                    elif not (balas_hammer[0]) and i == balas_hammer[2]:  # = maw penalty in a row
-                        s_balas = '\033[1;31;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red.
+                    elif not (balas_hammer[0]) and i == balas_hammer[2]:
+                        s_balas = '\033[1;31;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])
                         l_s_balas = 14
                     if balas_hammer[0]:
                         if i == balas_hammer[1] and j == balas_hammer[2]:
-                            s_balas = '\033[1;31;40m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red and black background.
+                            s_balas = '\033[1;31;40m{}\033[0m'.format(self.transport_proposal_matrix[i][j])
                     else:
                         if j == balas_hammer[1] and i == balas_hammer[2]:
-                            s_balas = '\033[1;31;40m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red and black background.
+                            s_balas = '\033[1;31;40m{}\033[0m'.format(self.transport_proposal_matrix[i][j])
                 print(f"{s_balas:>{max_prop_size+l_s_balas}}", end="")
             print(f"{self.provisions[i]:>{max_char_size}}", end="")
             if penalties:
@@ -208,80 +186,62 @@ class TransportationProblem:
                 self.balas_hammer(with_display=False)
 
     def north_west(self):
-        """Compute/set the initial proposal using North-West method,
-        put result in self.transport_proposal_matrix."""
-        available = self.provisions[:]  # Allows copying quickly w/o affecting original attributes
+        available = self.provisions[:]
         to_complete = self.orders[:]
         i = 0
         j = 0
-        while to_complete != [0 for _ in range(self.nb_customers)]:  # nb_customers = len(to_complete)
-            self.transport_proposal_matrix[i][j] = available[i] if available[i] < to_complete[j] else to_complete[j]  # We got two cases, either supply < order and we put all the supply in the proposal cell, on the other case we put all the amount needed for the order in the cell.
-            available[i] = available[i] - self.transport_proposal_matrix[i][j]  # We update our supply and demand accordingly to the modification we've done
+        while to_complete != [0 for _ in range(self.nb_customers)]:
+            self.transport_proposal_matrix[i][j] = available[i] if available[i] < to_complete[j] else to_complete[j]
+            available[i] = available[i] - self.transport_proposal_matrix[i][j]
             to_complete[j] = to_complete[j] - self.transport_proposal_matrix[i][j]
-            if to_complete[j] == 0:  # Following depletion of the demand or the supply, we move to the column to its right or the row under.
+            if to_complete[j] == 0:
                 j += 1
             else:
                 i += 1
 
     def balas_hammer(self, with_display=True):
-        """Compute/set the initial proposal using Balas-Hammer/Penalties method,
-        put result in self.transport_proposal_matrix."""
-
-        available = self.provisions[:]  # Allows copying quickly w/o affecting original attributes
+        available = self.provisions[:]
         to_complete = self.orders[:]
 
         penalties_row = [0 for _ in range(0, len(available))]
         penalties_col = [0 for _ in range(0, len(to_complete))]
 
         while to_complete != [0 for _ in range(0, len(to_complete))]:
-
-            # penalties calculation
-            # penalty (of a row/col) = difference between 2 smallest costs (of a row/col)
-
-            # Process calculation for the penalties attributed to each row
             for i in range(0, len(penalties_row)):
-                min = [float('inf'), float('inf')]  # Infinity is of course an easy minimum to dislodge
-                for j in range(len(self.orders)):  # Goes through whole row
-                    if self.costs_matrix[i][j] <= min[0] and penalties_row[i] != -1 and penalties_col[j] != -1:  # if we find a cost lower than our minimum (excludes used rows and columns marked by a -1 penalty)
-                        min[1] = min[0]  # We move the former minimum to the second spot, becoming our 2nd lowest cost
-                        min[0] = self.costs_matrix[i][j]
-                # - to be sure to have the 2nd lowest minimum in min[1] we check again:
+                min_c = [float('inf'), float('inf')]
                 for j in range(len(self.orders)):
-                    if self.costs_matrix[i][j] <= min[1] and self.costs_matrix[i][j] != min[0] and penalties_row[i] != -1 and penalties_col[j] != -1:  # exclude the smallest minimum
-                        min[1] = self.costs_matrix[i][j]  # Assign penultimate to second minimum
-                # -
-                penalties_row[i] = min[1] - min[0] if min != [float('inf'), float('inf')] else -1  # to avoid inf - inf producing a nan, we replace by -1 in some cases
+                    if self.costs_matrix[i][j] <= min_c[0] and penalties_row[i] != -1 and penalties_col[j] != -1:
+                        min_c[1] = min_c[0]
+                        min_c[0] = self.costs_matrix[i][j]
+                for j in range(len(self.orders)):
+                    if self.costs_matrix[i][j] <= min_c[1] and self.costs_matrix[i][j] != min_c[0] and penalties_row[i] != -1 and penalties_col[j] != -1:
+                        min_c[1] = self.costs_matrix[i][j]
+                penalties_row[i] = min_c[1] - min_c[0] if min_c != [float('inf'), float('inf')] else -1
             if with_display:
                 print("Penalties of rows :", str(penalties_row))
 
-            # Process calculation for the penalties attributed to each column
             for i in range(0, len(penalties_col)):
-                min = [float('inf'), float('inf')]
-                for j in range(len(self.provisions)):  # Goes through whole column
-                    if self.costs_matrix[j][i] <= min[0] and penalties_col[i] != -1 and penalties_row[j] != -1:  # if we find a cost lower than our minimum (excluding columns and rows used by the algorithm, marked with a -1 penalty)
-                        min[1] = min[0]  # We move the former minimum to the second spot, becoming our 2nd lowest cost
-                        min[0] = self.costs_matrix[j][i]
-                # - to be sure to have the 2nd lowest minimum in min[1] we check again:
+                min_c = [float('inf'), float('inf')]
                 for j in range(len(self.provisions)):
-                    if self.costs_matrix[j][i] <= min[1] and self.costs_matrix[j][i] != min[0] and penalties_col[i] != -1 and penalties_row[j] != -1:  # exclude the smallest minimum
-                        min[1] = self.costs_matrix[j][i]  # Assign penultimate to second minimum
-                # -
-                penalties_col[i] = min[1] - min[0] if min != [float('inf'), float('inf')] else -1  # to avoid inf - inf producing a nan, we replace by inf in some cases
+                    if self.costs_matrix[j][i] <= min_c[0] and penalties_col[i] != -1 and penalties_row[j] != -1:
+                        min_c[1] = min_c[0]
+                        min_c[0] = self.costs_matrix[j][i]
+                for j in range(len(self.provisions)):
+                    if self.costs_matrix[j][i] <= min_c[1] and self.costs_matrix[j][i] != min_c[0] and penalties_col[i] != -1 and penalties_row[j] != -1:
+                        min_c[1] = self.costs_matrix[j][i]
+                penalties_col[i] = min_c[1] - min_c[0] if min_c != [float('inf'), float('inf')] else -1
             if with_display:
                 print("Penalties of columns :", str(penalties_col))
 
-            # find col with maximum penalty
             max_pen_col = [penalties_col[0], 0]
-            for i in range(0, len(penalties_col)):  # We look towards minimum penalty for row and column, and their position in the list
+            for i in range(0, len(penalties_col)):
                 if penalties_col[i] >= max_pen_col[0]:
                     max_pen_col = [penalties_col[i], i]
             max_pen_row = [penalties_row[0], 0]
-            # find row with maximum penalty
             for i in range(0, len(penalties_row)):
                 if penalties_row[i] >= max_pen_row[0]:
                     max_pen_row = [penalties_row[i], i]
 
-            # penalty_equalities: to display in a different color the rows or cols with same penalty value than the maximum penalty.
             penalty_equalities = []
             if max_pen_col[0] >= max_pen_row[0]:
                 for i in range(0, len(penalties_col)):
@@ -291,54 +251,47 @@ class TransportationProblem:
                 for i in range(0, len(penalties_row)):
                     if penalties_row[i] == max_pen_row[0]:
                         penalty_equalities.append(("row", i))
-            # ## display : "Display of row(s) (or columns) with the maximum penalty" -> put them in colors
+                        
             if with_display:
                 penalties_tuple = (penalties_row, penalties_col)
                 self.display_full_transportation_problem_with_proposal(penalties=penalties_tuple, penalty_equalities=penalty_equalities)
 
-            # find max penalty. (Is there one or many ? Is it in a row or in a col ?)
-            # and do stuff with it :
-            # "choice of edge to fill" = find min cost across all max penalties, and fill max quantity possible.
             minimum_cost = chosen_penalty = cheapest_cell_index = max_quantity_possible = None
             for p in penalty_equalities:
-                # find the max penalty to use by looking where is the minimum cost in the max penalties cols/rows.
-                # find min cost
                 if p[0] == "col":
-                    for s in range(self.nb_suppliers):  # self.nb_suppliers = len(self.transport_proposal_matrix)
+                    for s in range(self.nb_suppliers):
                         if cheapest_cell_index is None:
                             if penalties_row[s] != -1:
                                 minimum_cost = self.costs_matrix[s][p[1]]
                                 chosen_penalty = p
                                 cheapest_cell_index = s
-                                max_quantity_possible = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[chosen_penalty[1]] else to_complete[chosen_penalty[1]]  # Assigns as much supply as possible
+                                max_quantity_possible = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[chosen_penalty[1]] else to_complete[chosen_penalty[1]]
                         else:
-                            if self.costs_matrix[s][p[1]] < minimum_cost and penalties_row[s] != -1:  # Finds cell with cheapest cost (excluding -1 cols)
+                            if self.costs_matrix[s][p[1]] < minimum_cost and penalties_row[s] != -1:
                                 minimum_cost = self.costs_matrix[s][p[1]]
                                 chosen_penalty = p
                                 cheapest_cell_index = s
-                                max_quantity_possible = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[chosen_penalty[1]] else to_complete[chosen_penalty[1]]  # Assigns as much supply as possible
-                            # tie case = if two minimum costs are equal, choose where we can assign as much as possible :
+                                max_quantity_possible = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[chosen_penalty[1]] else to_complete[chosen_penalty[1]]
                             elif self.costs_matrix[s][p[1]] == minimum_cost and penalties_row[s] != -1:
                                 if max_quantity_possible < (available[s] if available[s] < to_complete[p[1]] else to_complete[p[1]]):
                                     minimum_cost = self.costs_matrix[s][p[1]]
                                     chosen_penalty = p
                                     cheapest_cell_index = s
-                                    max_quantity_possible = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[chosen_penalty[1]] else to_complete[chosen_penalty[1]]  # Assigns as much supply as possible
-                else:  # if elt[0] == "row":
-                    for c in range(self.nb_customers):  # self.nb_customers = len(self.transport_proposal_matrix[0])
+                                    max_quantity_possible = available[cheapest_cell_index] if available[cheapest_cell_index] < to_complete[chosen_penalty[1]] else to_complete[chosen_penalty[1]]
+                else:
+                    for c in range(self.nb_customers):
                         if cheapest_cell_index is None:
                             if penalties_col[c] != -1:
                                 minimum_cost = self.costs_matrix[p[1]][c]
                                 chosen_penalty = p
                                 cheapest_cell_index = c
-                                max_quantity_possible = available[chosen_penalty[1]] if available[chosen_penalty[1]] < to_complete[cheapest_cell_index] else to_complete[cheapest_cell_index]  # Assigns as much supply as possible
+                                max_quantity_possible = available[chosen_penalty[1]] if available[chosen_penalty[1]] < to_complete[cheapest_cell_index] else to_complete[cheapest_cell_index]
                         else:
-                            if self.costs_matrix[p[1]][c] < minimum_cost and penalties_col[c] != -1:  # Finds cell with cheapest cost (excluding -1 rows)
+                            if self.costs_matrix[p[1]][c] < minimum_cost and penalties_col[c] != -1:
                                 minimum_cost = self.costs_matrix[p[1]][c]
                                 chosen_penalty = p
                                 cheapest_cell_index = c
-                                max_quantity_possible = available[chosen_penalty[1]] if available[chosen_penalty[1]] < to_complete[cheapest_cell_index] else to_complete[cheapest_cell_index]  # Assigns as much supply as possible
-                            # tie case = if two minimum costs are equal, choose where we can assign as much as possible :
+                                max_quantity_possible = available[chosen_penalty[1]] if available[chosen_penalty[1]] < to_complete[cheapest_cell_index] else to_complete[cheapest_cell_index]
                             elif self.costs_matrix[p[1]][c] == minimum_cost and penalties_col[c] != -1:
                                 if max_quantity_possible < (available[p[1]] if available[p[1]] < to_complete[c] else to_complete[c]):
                                     minimum_cost = self.costs_matrix[p[1]][c]
@@ -346,19 +299,17 @@ class TransportationProblem:
                                     cheapest_cell_index = c
                                     max_quantity_possible = available[chosen_penalty[1]] if available[chosen_penalty[1]] < to_complete[cheapest_cell_index] else to_complete[cheapest_cell_index]
 
-            if chosen_penalty[0] == "col":  # If the chosen max penalty is a column
-                # fill max quantity possible
-                self.transport_proposal_matrix[cheapest_cell_index][chosen_penalty[1]] = max_quantity_possible  # Assigns as much supply as possible to that cheap cell
-                available[cheapest_cell_index] = available[cheapest_cell_index] - self.transport_proposal_matrix[cheapest_cell_index][chosen_penalty[1]]  # We update our supply and demand accordingly to the modification we've done
+            if chosen_penalty[0] == "col":
+                self.transport_proposal_matrix[cheapest_cell_index][chosen_penalty[1]] = max_quantity_possible
+                available[cheapest_cell_index] = available[cheapest_cell_index] - self.transport_proposal_matrix[cheapest_cell_index][chosen_penalty[1]]
                 to_complete[chosen_penalty[1]] = to_complete[chosen_penalty[1]] - self.transport_proposal_matrix[cheapest_cell_index][chosen_penalty[1]]
                 if to_complete[chosen_penalty[1]] == 0:
-                    penalties_col[chosen_penalty[1]] = -1  # Signal that this spot should not be used for penalty calculation
+                    penalties_col[chosen_penalty[1]] = -1
                 if available[cheapest_cell_index] == 0:
                     penalties_row[cheapest_cell_index] = -1
-            else:  # If the chosen max penalty is a row
-                # fill max quantity possible
-                self.transport_proposal_matrix[chosen_penalty[1]][cheapest_cell_index] = max_quantity_possible  # We got two cases, either supply < order and we put all the supply in the proposal cell, on the other case we put all the amount needed for the order in the cell.
-                available[chosen_penalty[1]] = available[chosen_penalty[1]] - self.transport_proposal_matrix[chosen_penalty[1]][cheapest_cell_index]  # We update our supply and demand accordingly to the modification we've done
+            else:
+                self.transport_proposal_matrix[chosen_penalty[1]][cheapest_cell_index] = max_quantity_possible
+                available[chosen_penalty[1]] = available[chosen_penalty[1]] - self.transport_proposal_matrix[chosen_penalty[1]][cheapest_cell_index]
                 to_complete[cheapest_cell_index] = to_complete[cheapest_cell_index] - self.transport_proposal_matrix[chosen_penalty[1]][cheapest_cell_index]
                 if to_complete[cheapest_cell_index] == 0:
                     penalties_col[cheapest_cell_index] = -1
@@ -368,22 +319,10 @@ class TransportationProblem:
             if with_display:
                 print("transport proposal matrix:", self.transport_proposal_matrix)
                 print("costs matrix:", self.costs_matrix)
-
-                # ## display : "Display of row(s) (or columns) with the maximum penalty" -> put them in colors
                 balas_tuple = (chosen_penalty[0] == "col", cheapest_cell_index, chosen_penalty[1])
-
-                # -> without display penalties :
-                # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple)
-                # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalty_equalities=penalty_equalities)
-
-                # -> with display penalties :
                 penalties_tuple = (penalties_row, penalties_col)
-                # self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalties=penalties_tuple)
                 self.display_full_transportation_problem_with_proposal(balas_hammer=balas_tuple, penalties=penalties_tuple, penalty_equalities=penalty_equalities)
-
                 print()
-
-        # end while loop / Balas-Hammer
 
     def path_to_root(self, parents, current_vertex):
         path = []
@@ -415,7 +354,7 @@ class TransportationProblem:
                     initial_vertex = (1, initial_vertex[1] + 1)
             parents = {initial_vertex: None}
             queue = [initial_vertex]
-            print(queue)
+            # BUG FIX : Enlevé le print(queue) qui spamme la console
             head = 0
             visited = {queue[head]}
             while head < len(queue):
@@ -490,6 +429,8 @@ class TransportationProblem:
     def connect_graph(self, visited, not_connected):
         lowest_cost = float('inf')
         vertex_nb = 0
+        added_edge = []
+        new_visited = visited
         while vertex_nb < len(not_connected):
             current = not_connected[vertex_nb]
             if current[0] == 0:
@@ -501,7 +442,7 @@ class TransportationProblem:
                             lowest_cost = self.costs_matrix[current[1]][customer_nb]
                             added_edge = [current[1], customer_nb]
                             new_visited = visited_test
-                            self.transport_proposal_matrix[current[1]][customer_nb] = 0
+                        self.transport_proposal_matrix[current[1]][customer_nb] = 0
             else:
                 for supplier_nb in range(self.nb_suppliers):
                     if (0, supplier_nb) in visited and self.costs_matrix[supplier_nb][current[1]] < lowest_cost:
@@ -511,38 +452,40 @@ class TransportationProblem:
                             lowest_cost = self.costs_matrix[supplier_nb][current[1]]
                             added_edge = [supplier_nb, current[1]]
                             new_visited = visited_test
-                            self.transport_proposal_matrix[supplier_nb][current[1]] = 0
+                        self.transport_proposal_matrix[supplier_nb][current[1]] = 0
             vertex_nb += 1
         return added_edge, new_visited
 
-    def test_degenerate(self):
+    def test_degenerate(self, with_display=True):
         cycle = ["initialization"]
         while cycle:
             cycle, visited = self.search_cycle([])
             if cycle:
-                print()
-                print("The graph contain a cycle:")
-                first_vertex = True
-                for vertex in cycle:
-                    if first_vertex is True:
-                        first_vertex = False
-                    else:
-                        print("-", end=" ")
-                    if vertex[0] == 0:
-                        print(end="P")
-                    else:
-                        print(end="C")
-                    print(vertex[1] + 1, end=" ")
-                print()
+                if with_display:
+                    print("\nThe graph contain a cycle:")
+                    first_vertex = True
+                    for vertex in cycle:
+                        if first_vertex is True:
+                            first_vertex = False
+                        else:
+                            print("-", end=" ")
+                        if vertex[0] == 0:
+                            print(end="P")
+                        else:
+                            print(end="C")
+                        print(vertex[1] + 1, end=" ")
+                    print()
+                    
                 delta, removed_edges = self.supress_cycle(cycle)
-                print()
-                print("delta =", delta)
-                print("removed edges:")
-                for removed_edge in removed_edges:
-                    print("P" + str(removed_edge[0][1] + 1) + " - C" + str(removed_edge[1][1] + 1))
+                
+                if with_display:
+                    print("\ndelta =", delta)
+                    print("removed edges:")
+                    for removed_edge in removed_edges:
+                        print("P" + str(removed_edge[0][1] + 1) + " - C" + str(removed_edge[1][1] + 1))
             else:
-                print()
-                print("There is no cycle")
+                if with_display:
+                    print("\nThere is no cycle")
 
         not_connected = ["initialization"]
         additional_edges = []
@@ -551,18 +494,18 @@ class TransportationProblem:
             if not_connected:
                 added_edge, visited = self.connect_graph(visited, not_connected)
                 self.transport_proposal_matrix[added_edge[0]][added_edge[1]] = 1
-                print()
-                print("added edge: P" + str(added_edge[0] + 1) + " - C" + str(added_edge[1] + 1))
+                if with_display:
+                    print("\nadded edge: P" + str(added_edge[0] + 1) + " - C" + str(added_edge[1] + 1))
                 additional_edges.append(added_edge)
             else:
                 for edge_added in additional_edges:
                     self.transport_proposal_matrix[edge_added[0]][edge_added[1]] = 0
-                print()
-                print("The graph is connected")
+                if with_display:
+                    print("\nThe graph is connected")
 
         return additional_edges
 
-    def compute_potential_marginal_costs(self, additional_edges):
+    def compute_potential_marginal_costs(self, additional_edges, with_display=True):
         parents = {(0, 0): None}
         queue = [(0, 0)]
         head = 0
@@ -591,8 +534,9 @@ class TransportationProblem:
                         self.potential_costs_matrix[supplier_nb][current_vertex[1]] = self.costs_matrix[supplier_nb][current_vertex[1]]
                         vertex_potentials[0][supplier_nb] = self.potential_costs_matrix[supplier_nb][current_vertex[1]] + vertex_potentials[1][current_vertex[1]]
             head += 1
-        print()
-        print(vertex_potentials)
+            
+        if with_display:
+            print("\nVertex potentials:", vertex_potentials)
 
         for supplier_nb in range(self.nb_suppliers):
             for customer_nb in range(self.nb_customers):
@@ -606,19 +550,29 @@ class TransportationProblem:
         for supplier_nb in range(self.nb_suppliers):
             for customer_nb in range(self.nb_customers):
                 if self.marginal_costs_matrix[supplier_nb][customer_nb] < lowest_marginal_cost:
+                    lowest_marginal_cost = self.marginal_costs_matrix[supplier_nb][customer_nb]
                     new_edge = [supplier_nb, customer_nb]
         return new_edge
 
     def add_improving_edge(self, cycle, new_edge):
+        # --- BUG FIX (Arthur) : Orient the cycle to ensure new_edge is ADDED (+ delta) ---
+        s_node = (0, new_edge[0])
+        c_node = (1, new_edge[1])
+        for i in range(len(cycle) - 1):
+            if (cycle[i] == s_node and cycle[i+1] == c_node) or (cycle[i] == c_node and cycle[i+1] == s_node):
+                if i % 2 == 1:
+                    cycle.reverse()
+                break
+
         delta = float('inf')
         for vertex_nb in range(len(cycle) - 1):
             if vertex_nb % 2 == 1:
                 current = cycle[vertex_nb]
                 next_vertex = cycle[vertex_nb + 1]
-                print(next_vertex)
-                if current[0] == 0 and self.transport_proposal_matrix[current[1]][next_vertex[1]] != 0:
+                # --- BUG FIX (Arthur) : Removed '!= 0' checks to allow delta=0 on degenerate graphs ---
+                if current[0] == 0:
                     delta = min(delta, self.transport_proposal_matrix[current[1]][next_vertex[1]])
-                elif self.transport_proposal_matrix[next_vertex[1]][current[1]] != 0:
+                else:
                     delta = min(delta, self.transport_proposal_matrix[next_vertex[1]][current[1]])
 
         removed_edges = []
@@ -639,51 +593,56 @@ class TransportationProblem:
                     self.transport_proposal_matrix[next_vertex[1]][current[1]] -= delta
                     if self.transport_proposal_matrix[next_vertex[1]][current[1]] == 0:
                         removed_edges.append([next_vertex, current])
-        print(delta)
-        print(removed_edges)
         return delta, removed_edges
 
-    def stepping_stone(self):
-        additional_edges = self.test_degenerate()
-        self.compute_potential_marginal_costs(additional_edges)
+    def stepping_stone(self, with_display=True):
+        additional_edges = self.test_degenerate(with_display)
+        self.compute_potential_marginal_costs(additional_edges, with_display)
         new_edge = self.test_optimal()
+        
         while new_edge:
-            print()
-            print("the transportation proposal is sub-optimal")
+            if with_display:
+                print("\nthe transportation proposal is sub-optimal")
+                print("new improving edge:", new_edge)
+                
             additional_edges.append(new_edge)
             cycle, visited = self.search_cycle(additional_edges)
-            print(new_edge)
-            print(cycle)
             delta, removed_edges = self.add_improving_edge(cycle, new_edge)
+            
+            # --- BUG FIX (Arthur) : Only remove ONE edge to avoid disconnecting degenerate graphs ---
+            leaving_edge = removed_edges[0] if removed_edges else None
+            
             for removed_edge in removed_edges:
-                if [removed_edge[0][1], removed_edge[1][1]] in additional_edges:
-                    additional_edges.remove([removed_edge[0][1], removed_edge[1][1]])
-            self.compute_potential_marginal_costs(additional_edges)
+                edge_formatted = [removed_edge[0][1], removed_edge[1][1]]
+                if removed_edge == leaving_edge:
+                    if edge_formatted in additional_edges:
+                        additional_edges.remove(edge_formatted)
+                else:
+                    # If multiple edges reached 0, keep the others in the basis (degenerate cells)
+                    if edge_formatted not in additional_edges:
+                        additional_edges.append(edge_formatted)
+                        
+            self.compute_potential_marginal_costs(additional_edges, with_display)
             new_edge = self.test_optimal()
-        print()
-        print("the transportation proposal is optimal")
+            
+        if with_display:
+            print("\nthe transportation proposal is optimal")
 
-
-def show_n_t(x: str) -> None:  # Just to verify than the 'save_tp_as_x' method works correctly.
+def show_n_t(x: str) -> None:
     with open("./transportation proposals/" + x + ".txt", 'r') as f:
         line = f.readline()
         while line != "":
             print(line.replace('\t', '\\t').replace('\n', '\\n'))
             line = f.readline()
-        # print(line.replace('\t', 't').replace('\n', 'n'))
-
 
 def verify_txt(x: str) -> None:
-    """to transform 't', spaces or '\t' in '\t',
-    when creating/modifying transportation proposals txt from Pycharm,
-    - to be able to create/modify them easily from Pycharm."""
     lines, unmodified_lines = [], []
 
     with open("./transportation proposals/" + str(x) + ".txt", 'r') as f:
         line = f.readline()
         while line != "":
             unmodified_lines.append(line)
-            line = ' '.join(line.split())  # transform spaces into only 1 space.
+            line = ' '.join(line.split())
             line = line.replace('\\', '')
             line = line.replace('t', '\t')
             line = line.replace(' ', '\t')
