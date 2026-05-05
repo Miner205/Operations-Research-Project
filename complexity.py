@@ -44,10 +44,10 @@ def generate_random_tp_file(n, filename="random_temp"):
 
 def run_complexity_study():
     # ATTENTION: Pour tester, je mets des petites valeurs
-    #n_values = [10, 40, 100, 400, 1000, 4000, 10000]
-    #iterations = 100
-    iterations = 10
-    n_values = [10, 20, 30, 40]
+    n_values = [10, 40, 100]#, 400]#, 1000, 4000]#, 10000]
+    iterations = 50
+    #iterations = 10
+    #n_values = [10, 20, 30, 40]
     #iterations = 5
     
     results = {n: {'theta_NW': [], 'theta_BH': [], 't_NW': [], 't_BH': []} for n in n_values}

@@ -166,7 +166,7 @@ class TransportationProblem:
                     if balas_hammer[0] and j == balas_hammer[2]:  # = max penalty in a col
                         s_balas = '\033[1;31;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red.
                         l_s_balas = 14
-                    elif not (balas_hammer[0]) and i == balas_hammer[2]:  # = maw penalty in a row
+                    elif not (balas_hammer[0]) and i == balas_hammer[2]:  # = max penalty in a row
                         s_balas = '\033[1;31;48m{}\033[0m'.format(self.transport_proposal_matrix[i][j])  # text in red.
                         l_s_balas = 14
                     if balas_hammer[0]:
