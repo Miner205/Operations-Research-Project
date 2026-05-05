@@ -437,10 +437,11 @@ class TransportationProblem:
             # print(queue) # enlevé pour ne pas spam la console
             head = 0
             visited = {queue[head]}
-            while head < len(queue):
+            while head < len(queue) and not cycle:
                 current_vertex = queue[head]
                 if current_vertex[0] == 0:
-                    for customer_nb in range(self.nb_customers):
+                    customer_nb = 0
+                    while customer_nb < self.nb_customers and not cycle:
                         if ((self.transport_proposal_matrix[current_vertex[1]][customer_nb] != 0 or [current_vertex[1], customer_nb] in additional_edges)
                                 and (1, customer_nb) != parents.get(current_vertex)):
                             if (1, customer_nb) in visited:
@@ -449,8 +450,10 @@ class TransportationProblem:
                                 queue.append((1, customer_nb))
                                 visited.add((1, customer_nb))
                                 parents[(1, customer_nb)] = current_vertex
+                        customer_nb += 1
                 else:
-                    for supplier_nb in range(self.nb_suppliers):
+                    supplier_nb = 0
+                    while supplier_nb < self.nb_suppliers and not cycle:
                         if ((self.transport_proposal_matrix[supplier_nb][current_vertex[1]] != 0 or [supplier_nb, current_vertex[1]] in additional_edges)
                                 and (0, supplier_nb) != parents.get(current_vertex)):
                             if (0, supplier_nb) in visited:
@@ -459,6 +462,7 @@ class TransportationProblem:
                                 queue.append((0, supplier_nb))
                                 visited.add((0, supplier_nb))
                                 parents[(0, supplier_nb)] = current_vertex
+                        supplier_nb += 1
                 head += 1
             if initial_vertex == (0, 0):
                 connected = visited
@@ -534,6 +538,7 @@ class TransportationProblem:
                             new_visited = visited_test
                         self.transport_proposal_matrix[supplier_nb][current[1]] = 0
             vertex_nb += 1
+        self.transport_proposal_matrix[added_edge[0]][added_edge[1]] = 1
         return added_edge, new_visited
 
     def test_degenerate(self, with_display=True):
@@ -573,7 +578,6 @@ class TransportationProblem:
             not_connected = self.test_connectivity(visited)
             if not_connected:
                 added_edge, visited = self.connect_graph(visited, not_connected)
-                self.transport_proposal_matrix[added_edge[0]][added_edge[1]] = 1
                 if with_display:
                     print("\nadded edge: P" + str(added_edge[0] + 1) + " - C" + str(added_edge[1] + 1))
                 additional_edges.append(added_edge)
@@ -600,7 +604,6 @@ class TransportationProblem:
                         queue.append((1, customer_nb))
                         visited.add((1, customer_nb))
                         parents[(1, customer_nb)] = current_vertex
-                        self.marginal_costs_matrix[current_vertex[1]][customer_nb] = 0
                         self.potential_costs_matrix[current_vertex[1]][customer_nb] = self.costs_matrix[current_vertex[1]][customer_nb]
                         vertex_potentials[1][customer_nb] = -self.potential_costs_matrix[current_vertex[1]][customer_nb] + vertex_potentials[0][current_vertex[1]]
             else:
@@ -610,7 +613,6 @@ class TransportationProblem:
                         queue.append((0, supplier_nb))
                         visited.add((0, supplier_nb))
                         parents[(0, supplier_nb)] = current_vertex
-                        self.marginal_costs_matrix[supplier_nb][current_vertex[1]] = 0
                         self.potential_costs_matrix[supplier_nb][current_vertex[1]] = self.costs_matrix[supplier_nb][current_vertex[1]]
                         vertex_potentials[0][supplier_nb] = self.potential_costs_matrix[supplier_nb][current_vertex[1]] + vertex_potentials[1][current_vertex[1]]
             head += 1
@@ -620,9 +622,8 @@ class TransportationProblem:
 
         for supplier_nb in range(self.nb_suppliers):
             for customer_nb in range(self.nb_customers):
-                if self.potential_costs_matrix[supplier_nb][customer_nb] == 0:
-                    self.potential_costs_matrix[supplier_nb][customer_nb] = vertex_potentials[0][supplier_nb] - vertex_potentials[1][customer_nb]
-                    self.marginal_costs_matrix[supplier_nb][customer_nb] = self.costs_matrix[supplier_nb][customer_nb] - self.potential_costs_matrix[supplier_nb][customer_nb]
+                self.potential_costs_matrix[supplier_nb][customer_nb] = vertex_potentials[0][supplier_nb] - vertex_potentials[1][customer_nb]
+                self.marginal_costs_matrix[supplier_nb][customer_nb] = self.costs_matrix[supplier_nb][customer_nb] - self.potential_costs_matrix[supplier_nb][customer_nb]
 
     def test_optimal(self):
         lowest_marginal_cost = 0
