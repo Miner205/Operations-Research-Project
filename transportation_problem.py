@@ -1,15 +1,5 @@
 class TransportationProblem:
     def __init__(self, x: str):
-        """
-        display the matrix.
-
-        :param matrix: self.costs_matrix, self.transport_proposal_matrix,
-        ... and probably also "Potential costs table" and "Marginal costs table" - à tester quand on les aura.
-        :param aesthetic_spaces: int ; nb of additional spaces for decoration.
-        :param is_costs_matrix: to display costs in blue (by convention).
-        :param with_provisions_and_orders: to also display provisions and orders.
-        :return: Nothing.
-        """
         self.name: str = x
         self.nb_suppliers: int = 0  # n ; nb_suppliers = len(provisions)
         self.nb_customers: int = 0  # m ; nb_customers = len(orders)
@@ -76,6 +66,16 @@ class TransportationProblem:
         return t
 
     def display_matrix(self, matrix, aesthetic_spaces=1, is_costs_matrix=False, with_provisions_and_orders=False) -> None:
+        """
+        display the matrix.
+
+        :param matrix: self.costs_matrix, self.transport_proposal_matrix,
+        ... and probably also "Potential costs table" and "Marginal costs table" - à tester (one day).
+        :param aesthetic_spaces: int ; nb of additional spaces for decoration.
+        :param is_costs_matrix: to display costs in blue (by convention).
+        :param with_provisions_and_orders: to also display provisions and orders.
+        :return: Nothing.
+        """
         max_char_size = 0
         for i in range(self.nb_suppliers):
             for j in range(self.nb_customers):
