@@ -18,33 +18,33 @@ while tp_number >= 0:
             print('Exiting the program...')
             pass
         else:
-            print("That transportation problem doesn't exist. Please try again.")
+            print("That transportation problem doesn't exist. Please try again.\n")
             tp_number = 0  # Putting an input here will make the program go out of the while, without initializing the tp variable. Putting at 0 will iterate back at the start of the loop
     if tp_number >= 0:
-        print()
+        print(f"\nTransportation problem {tp.name}:")
         tp.display_full_transportation_problem_with_proposal()
         
         print()
         tp.first_proposal()
 
-        print()
+        print("Initial proposal computed\n")
         print(tp)
 
-        print()
+        print(f"\nInitial proposal - full display:")
         tp.display_full_transportation_problem_with_proposal()
 
-        print()
+        print(f"\nCosts matrix:")
         tp.display_matrix(tp.costs_matrix, is_costs_matrix=True)
         print()
         tp.display_matrix(tp.costs_matrix, is_costs_matrix=True, with_provisions_and_orders=True)
 
-        print()
+        print(f"\nInitial proposal:")
         tp.display_matrix(tp.transport_proposal_matrix)
         print()
         tp.display_matrix(tp.transport_proposal_matrix, with_provisions_and_orders=True)
 
         print()
-        print("total cost of transport:", tp.total_cost_calculation())
+        print("Total cost of transport of initial proposal:", tp.total_cost_calculation())
 
         tp_number = 0
         c += 1
@@ -65,16 +65,25 @@ while tp_number >= 0:
         tp.display_matrix(tp.marginal_costs_matrix)"""
         #print()
         #tp.transport_proposal_matrix = [[60, 0, 0], [50, 20, 0], [80, 40, 0]]
-        print()
+
+        print("\n\n# Stepping Stone #")
+
+        print(f"\nInitial proposal:")
         tp.display_matrix(tp.transport_proposal_matrix)
         print()
         tp.stepping_stone()
-        print()
+        print(f"\nPotential costs:")
         tp.display_matrix(tp.potential_costs_matrix)
-        print()
+        print(f"\nMarginal costs:")
         tp.display_matrix(tp.marginal_costs_matrix)
-        print()
+        print(f"\nFinal proposal:")
         tp.display_matrix(tp.transport_proposal_matrix)
+
+        print(f"\nFinal proposal - full display:")
+        tp.display_full_transportation_problem_with_proposal()
+
+        print()
+        print("Total cost of transport of final proposal:", tp.total_cost_calculation())
         print()
 
 
