@@ -639,11 +639,14 @@ class TransportationProblem:
         # --- BUG FIX (Arthur) : Orient the cycle to ensure new_edge is ADDED (+ delta) ---
         s_node = (0, new_edge[0])
         c_node = (1, new_edge[1])
-        for i in range(len(cycle) - 1):
+        new_edge_passed = False
+        i = 0
+        while i < len(cycle) - 1 and new_edge_passed is False:
             if (cycle[i] == s_node and cycle[i+1] == c_node) or (cycle[i] == c_node and cycle[i+1] == s_node):
                 if i % 2 == 1:
                     cycle.reverse()
-                break
+                new_edge_passed = True
+            i += 1
 
         delta = float('inf')
         for vertex_nb in range(len(cycle) - 1):
@@ -691,7 +694,7 @@ class TransportationProblem:
             delta, removed_edges = self.add_improving_edge(cycle, new_edge)
             
             # --- BUG FIX (Arthur) : Only remove ONE edge to avoid disconnecting degenerate graphs ---
-            leaving_edge = removed_edges[0] if removed_edges else None
+            leaving_edge = removed_edges[0]
             
             for removed_edge in removed_edges:
                 edge_formatted = [removed_edge[0][1], removed_edge[1][1]]
