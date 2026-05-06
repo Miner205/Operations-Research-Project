@@ -70,7 +70,7 @@ class TransportationProblem:
         display the matrix.
 
         :param matrix: self.costs_matrix, self.transport_proposal_matrix,
-        ... and probably also "Potential costs table" and "Marginal costs table" - à tester (one day).
+        and also self.potential_costs_matrix and self.marginal_costs_matrix.
         :param aesthetic_spaces: int ; nb of additional spaces for decoration.
         :param is_costs_matrix: to display costs in blue (by convention).
         :param with_provisions_and_orders: to also display provisions and orders.
@@ -193,20 +193,23 @@ class TransportationProblem:
 
     def first_proposal(self):
         answer = 0
-        while answer not in ['1', '2', '3']:
+        while answer not in ['1', '2', '3', '4']:
             print("Pick a initial proposal method :\n"
-                  "1 for North-West\n"
-                  "2 for Balas-Hammer/Penalties with Display\n"
-                  "3 for Balas-Hammer/Penalties without Display")
+                  "1 for North-West with Display\n"
+                  "2 for North-West without Display\n"
+                  "3 for Balas-Hammer/Penalties with Display\n"
+                  "4 for Balas-Hammer/Penalties without Display")
             answer = input()
             if answer == '1':
-                self.north_west()
+                self.north_west(with_display=True)
             elif answer == '2':
-                self.balas_hammer()
+                self.north_west()
             elif answer == '3':
+                self.balas_hammer()
+            elif answer == '4':
                 self.balas_hammer(with_display=False)
 
-    def north_west(self):
+    def north_west(self, with_display=False):
         """Compute/set the initial proposal using North-West method,
         put result in self.transport_proposal_matrix."""
         available = self.provisions[:]  # Allows copying quickly w/o affecting original attributes
@@ -228,6 +231,10 @@ class TransportationProblem:
                 j += 1
             else:
                 i += 1
+
+            if with_display:
+                self.display_full_transportation_problem_with_proposal()
+                print()
 
     def balas_hammer(self, with_display=True):
         """Compute/set the initial proposal using Balas-Hammer/Penalties method,

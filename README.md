@@ -22,10 +22,11 @@ https://github.com/Miner205/Operations-Research-Project
 - ...
 
 # ToDo :
+- run the complexity.py with n = 10 to 10000 (need to let code run at least 24h).
 
 
 # Functionalities done :
-- Transportation Problem: load TP (Read data), save TP, display matrix/tables(Cost matrix, Transportation proposal, ...)
+- Transportation Problem: load TP (Read data), save TP, display matrix/tables(Cost matrix, Transportation proposal, Potential costs table, Marginal costs table)
     - Total cost calculation for a given transport proposal. 
 - Solve TP :
   - find the best way of transporting objects from suppliers to customers that minimizes the total cost of transport. /!\ Only balanced case.
@@ -41,3 +42,4 @@ https://github.com/Miner205/Operations-Research-Project
 - pseudo-code of functions & slides (for Oral presentation of 10min).
 - Report 'on complexity' // "Study of complexity" -> cf pdf consignes.
 - Execution traces -> cf "Execution traces" Part in pdf consignes.
+- run the complexity.py with n = 10 to 100.
