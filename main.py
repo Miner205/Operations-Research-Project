@@ -1,9 +1,9 @@
 from transportation_problem import *
 
-first_message = "Welcome to the transportation problem solver! You can choose from the following transportation problems to solve: \n1. transportation_problem_1\n2. transportation_problem_2\n3. transportation_problem_3\n4. transportation_problem_4\n5. transportation_problem_5\n6. transportation_problem_6\n7. transportation_problem_7\n8. transportation_problem_8\n9. transportation_problem_9\n10. transportation_problem_10\n11. transportation_problem_11\n12. transportation_problem_12\n13. balas_hammer_tie_cases_test\n14. constraint_table_test\n15. small_table_test\n16. small_table_text2\n17. small_tabme_test_3 \nPlease enter the number of the transportation problem you want to solve (or a negative number to exit): "
+first_message = "Welcome to the transportation problem solver! You can choose from the following transportation problems to solve: \n1. transportation_problem_1\n2. transportation_problem_2\n3. transportation_problem_3\n4. transportation_problem_4\n5. transportation_problem_5\n6. transportation_problem_6\n7. transportation_problem_7\n8. transportation_problem_8\n9. transportation_problem_9\n10. transportation_problem_10\n11. transportation_problem_11\n12. transportation_problem_12\n13. balas_hammer_tie_cases_test\n14. constraint_table_test\n15. small_table_test\n16. small_table_test2\n17. small_tabme_test3 \nPlease enter the number of the transportation problem you want to solve (or a negative number to exit): "
 redo_message = "I hope you enjoyed solving that transportation problem! If you want to solve another one, please enter the number of the transportation problem you want to solve (or a negative number to exit): "
 tp_number = 0
-indexes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'balas_hammer_tie_cases_test', 'constraint_table_test', 'small_table_test', 'small_table_text2', 'small_tabme_test_3']
+indexes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'balas_hammer_tie_cases_test', 'constraint_table_test', 'small_table_test', 'small_table_test2', 'small_table_test3']
 c = 0
 while tp_number >= 0:
     while tp_number == 0:
@@ -12,7 +12,7 @@ while tp_number >= 0:
             print(tp_number)
         else:
             tp_number = int(input(redo_message))
-        if tp_number < len(indexes) and tp_number > 0:
+        if tp_number <= len(indexes) and tp_number > 0:
             tp = TransportationProblem(str(indexes[tp_number - 1]))
         elif tp_number < 0:
             print('Exiting the program...')
